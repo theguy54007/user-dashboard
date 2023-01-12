@@ -27,7 +27,9 @@ export class UsersService {
   }
 
   findAll() {
-    return `This action returns all users`;
+    return this.repo.createQueryBuilder()
+                    .getMany()
+
   }
 
   findOne(id: number) {
