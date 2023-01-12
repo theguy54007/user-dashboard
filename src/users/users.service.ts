@@ -12,16 +12,12 @@ export class UsersService {
 
   constructor(
     @InjectRepository(User) private repo: Repository<User>,
-    private hashingService: HashingService
+    // private hashingService: HashingService
   ){}
 
   async create(signUpDto: SignUpDto) {
     try {
-      const user = new User();
-      user.email = signUpDto.email;
-      user.password = await this.hashingService.hash(signUpDto.password);
-
-      return await this.repo.save(user);
+      return await this.repo.save(signUpDto);
     } catch (err) {
       const pgUniqueViolationErrorCode = '23505';
       if (err.code === pgUniqueViolationErrorCode) {
@@ -29,6 +25,10 @@ export class UsersService {
       }
       throw err;
     }
+  }
+
+  findOneBy(query: UserQuery){
+    return this.repo.findOneBy(query);
   }
 
   findAll() {
@@ -46,4 +46,9 @@ export class UsersService {
   remove(id: number) {
     return `This action removes a #${id} user`;
   }
+}
+
+
+interface UserQuery {
+  email?: string;
 }
