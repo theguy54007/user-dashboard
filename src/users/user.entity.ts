@@ -1,23 +1,28 @@
-import { Column, CreateDateColumn, PrimaryColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, PrimaryColumn, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
+@Entity('users')
 export class User {
 
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({unique: true})
   email: string;
 
-  @Column()
+  @Column({
+    nullable: true
+  })
   name: string;
 
   @Column()
   password: string;
 
   @Column({default: false})
-  isConfirm: Boolean
+  emailVerified: Boolean
 
-  @Column()
+  @Column({
+    nullable: true
+  })
   lastSignInAt: Date;
 
   @Column({default: 0})
