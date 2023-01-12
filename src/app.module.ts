@@ -4,6 +4,8 @@ import { APP_PIPE } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { UsersModule } from './users/users.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -23,7 +25,8 @@ import { AppService } from './app.service';
           autoLoadEntities: true
         }
       }
-    })
+    }),
+    UsersModule
   ],
   controllers: [AppController],
   providers: [
