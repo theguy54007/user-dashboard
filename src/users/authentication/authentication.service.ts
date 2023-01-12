@@ -1,6 +1,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { HashingService } from '../hashing/hashing.service';
+import { SignInDto } from './dto/sign-in.dto/sign-in.dto';
 import { SignUpDto } from './dto/sign-up.dto/sign-up.dto';
 
 @Injectable()
@@ -19,7 +20,7 @@ export class AuthenticationService {
     return user;
   }
 
-  async signIn(signInDto){
+  async signIn(signInDto: SignInDto){
     const { email, password } = signInDto
     const user = await this.userService.findOneBy({email})
 

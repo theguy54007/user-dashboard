@@ -1,23 +1,18 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { SignUpDto } from 'src/users/authentication/dto/sign-up.dto/sign-up.dto';
-import { HashingService } from 'src/users/hashing/hashing.service';
 import { Repository } from 'typeorm';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './user.entity';
 
 @Injectable()
 export class UsersService {
 
   constructor(
-    @InjectRepository(User) private repo: Repository<User>,
-    // private hashingService: HashingService
+    @InjectRepository(User) private repo: Repository<User>
   ){}
 
-  async create(signUpDto: SignUpDto) {
+  async create(userAttr: Partial<User>) {
     try {
-      return await this.repo.save(signUpDto);
+      return await this.repo.save(userAttr);
     } catch (err) {
       const pgUniqueViolationErrorCode = '23505';
       if (err.code === pgUniqueViolationErrorCode) {
@@ -36,11 +31,15 @@ export class UsersService {
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} user`;
+    return this.repo.findOneBy({id: id})
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: number, attrs: Partial<User>){
+    const user = await this.findOne(id)
+    if (!user) throw new NotFoundException('user not found');
+
+    Object.assign(user, attrs);
+    return this.repo.save(user);
   }
 
   remove(id: number) {

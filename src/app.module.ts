@@ -5,6 +5,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
+import {
+  NestCookieSessionOptions,
+  CookieSessionModule,
+} from 'nestjs-cookie-session';
 
 @Module({
   imports: [
@@ -22,6 +26,14 @@ import { UsersModule } from './users/users.module';
           password: config.get<string>('DB_PASSWORD'),
           synchronize: false,
           autoLoadEntities: true
+        }
+      }
+    }),
+    CookieSessionModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: async( config: ConfigService): Promise<NestCookieSessionOptions> =>{
+        return {
+          session: {secret: config.get<string>('COOKIE_KEY')}
         }
       }
     }),

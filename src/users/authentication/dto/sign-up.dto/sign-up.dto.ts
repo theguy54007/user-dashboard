@@ -1,12 +1,6 @@
-import { IsEmail, MinLength, Matches } from 'class-validator';
+import { PickType } from '@nestjs/mapped-types';
+import { CreateUserDto } from 'src/users/dto/create-user.dto';
 
-export class SignUpDto {
-  @IsEmail()
-  email: string;
+export class SignUpDto extends PickType(CreateUserDto,['email', 'password']) {
 
-  @MinLength(8, { message: " The min length of password is 8 " })
-  @Matches(/^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/,
-      { message: " A password at least contains one numeric digit, one special char, one lowercase char and one uppercase char" }
-  )
-  password: string;
 }
