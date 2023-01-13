@@ -1,4 +1,5 @@
-import { Body, Controller, Post, Session } from '@nestjs/common';
+import { Body, Controller, Post, Res, Session } from '@nestjs/common';
+import { Response } from 'express';
 import { Serialize } from 'src/interceptors/serialize.interceptor';
 import { UserDto } from '../dtos/user.dto';
 import { AuthenticationService } from './authentication.service';
@@ -19,15 +20,26 @@ export class AuthenticationController {
   }
 
   @Post('sign-in')
-  async signIn(@Body() body: SignInDto, @Session() session: any ){
+  async signIn(@Body() body: SignInDto, @Session() session: Record<string, any> ){
     const user = await this.authService.signIn(body)
-    session.userId = user.id
+    const {accessToken} = await this.authService.generateTokens(user)
+
+    session.accessToken = accessToken
+
+    // response.cookie('accessToken', accessToken, {
+    //   secure: true,
+    //   httpOnly: true,
+    //   sameSite: true
+    // })
+
+    // response.send('')
     return user
+    // return accessToken
   }
 
   @Post('/sign-out')
   signOut(@Session() session: any){
-    session.userId = null;
+    session.accessToken = null;
   }
 
 }

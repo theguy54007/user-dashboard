@@ -1,15 +1,14 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, Request, NotFoundException, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { CurrentUserInterceptor } from './interceptors/current-user.interceptor';
 import { Serialize } from 'src/interceptors/serialize.interceptor';
 import { UserDto } from './dtos/user.dto';
 import { AuthGuard } from 'src/guards/auth.guard';
+import { CurrentUser } from './decorator/current-user.decorator';
 
 @Controller('users')
-@UseInterceptors(CurrentUserInterceptor)
-@Serialize(UserDto)
 @UseGuards(AuthGuard)
+@Serialize(UserDto)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
@@ -24,13 +23,13 @@ export class UsersController {
   // }
 
   @Get('/me')
-  getMe(@Request() req){
-    return req.currentUser
+  getMe(@CurrentUser() user){
+    return user
   }
 
   @Patch('/user')
-  update(@Request() req, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(req.currentUser.id, updateUserDto);
+  update(@Body() updateUserDto: UpdateUserDto, @CurrentUser() user) {
+    return this.usersService.update(user.id, updateUserDto);
   }
 
   // @Delete(':id')

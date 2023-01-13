@@ -1,14 +1,12 @@
-import { Module, ValidationPipe } from '@nestjs/common';
+import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_PIPE } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
-import {
-  NestCookieSessionOptions,
-  CookieSessionModule,
-} from 'nestjs-cookie-session';
+
+const cookieSession = require('cookie-session')
 
 @Module({
   imports: [
@@ -29,14 +27,6 @@ import {
         }
       }
     }),
-    CookieSessionModule.forRootAsync({
-      inject: [ConfigService],
-      useFactory: async( config: ConfigService): Promise<NestCookieSessionOptions> =>{
-        return {
-          session: {secret: config.get<string>('COOKIE_KEY')}
-        }
-      }
-    }),
     UsersModule,
   ],
   controllers: [AppController],
@@ -50,4 +40,16 @@ import {
     },
   ],
 })
-export class AppModule {}
+export class AppModule {
+  constructor(
+    private configService: ConfigService
+  ){}
+
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(
+      cookieSession({
+        keys: [this.configService.get('COOKIE_KEY')]
+      })
+    ).forRoutes('*')
+  }
+}
