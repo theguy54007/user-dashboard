@@ -19,10 +19,10 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "typeorm": "ts-node ./node_modules/typeorm/cli",
-    "typeorm:run-migrations": "npm run typeorm migration:run -- -d ./typeorm.config.ts",
-    "typeorm:generate-migration": "npm run typeorm -- -d ./typeorm.config.ts migration:generate ./migrations/$npm_config_name",
+    "typeorm:run-migrations": "npm run typeorm migration:run -- -d ./config/typeorm.config.ts",
+    "typeorm:generate-migration": "npm run typeorm -- -d ./config/typeorm.config.ts migration:generate ./migrations/$npm_config_name",
     "typeorm:create-migration": "npm run typeorm -- migration:create ./migrations/$npm_config_name",
-    "typeorm:revert-migration": "npm run typeorm -- -d ./typeorm.config.ts migration:revert"
+    "typeorm:revert-migration": "npm run typeorm -- -d ./config/typeorm.config.ts migration:revert"
   },
   "dependencies": {
     "@nestjs/common": "^9.0.0",
@@ -32,6 +32,7 @@
     "@nestjs/mapped-types": "*",
     "@nestjs/platform-express": "^9.0.0",
     "@nestjs/typeorm": "^9.0.1",
+    "@sendgrid/mail": "^7.7.0",
     "@types/cookie-session": "^2.0.44",
     "bcrypt": "^5.1.0",
     "cookie-parser": "^1.4.6",

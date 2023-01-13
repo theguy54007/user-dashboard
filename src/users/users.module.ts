@@ -7,16 +7,18 @@ import { AuthenticationController } from 'src/users/authentication/authenticatio
 import { HashingService } from 'src/users/hashing/hashing.service';
 import { BcryptService } from 'src/users/hashing/bcrypt.service';
 import { AuthenticationService } from 'src/users/authentication/authentication.service';
-import jwtConfig from './authentication/config/jwt.config';
+import jwtConfig from '../../config/jwt.config';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
 import { CurrentUserMiddleware } from './middlewares/current-user.middleware';
+import { SendgridModule } from 'src/sendgrid/sendgrid.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User]),
     JwtModule.registerAsync(jwtConfig.asProvider()),
-    ConfigModule.forFeature(jwtConfig)
+    ConfigModule.forFeature(jwtConfig),
+    SendgridModule
   ],
   controllers: [
     UsersController,

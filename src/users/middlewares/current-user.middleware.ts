@@ -1,4 +1,4 @@
-import { Injectable, NestMiddleware, UnauthorizedException } from "@nestjs/common";
+import { Injectable, NestMiddleware } from "@nestjs/common";
 import { NextFunction, Request, Response } from "express";
 import { User } from "../user.entity";
 import { UsersService } from "../users.service";
@@ -29,10 +29,9 @@ export class CurrentUserMiddleware implements NestMiddleware {
         const user = await this.usersService.findOne(+payload.sub);
         req.currentUser = user;
       } catch {
-        throw new UnauthorizedException();
+        req.session.accessToken = null;
       }
     }
-
     next();
   }
 }

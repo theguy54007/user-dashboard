@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
+import { SendgridModule } from './sendgrid/sendgrid.module';
 
 const cookieSession = require('cookie-session')
 
@@ -28,6 +29,7 @@ const cookieSession = require('cookie-session')
       }
     }),
     UsersModule,
+    SendgridModule,
   ],
   controllers: [AppController],
   providers: [
