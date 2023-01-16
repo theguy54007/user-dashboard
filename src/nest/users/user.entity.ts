@@ -20,17 +20,12 @@ export class User {
   @Column({default: false})
   emailVerified: Boolean
 
-  @Column({
-    nullable: true
-  })
-  lastSignInAt: Date;
-
   @Column({default: 0})
   signInCount: number;
 
   @CreateDateColumn()
-  created_at: Date;
+  createdAt: Date;
 
   @UpdateDateColumn()
-  updated_at: Date;
+  updatedAt: Date;
 }
