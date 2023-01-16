@@ -5,14 +5,15 @@ import { Serialize } from 'src/nest/interceptors/serialize.interceptor';
 import { UserDto } from './dtos/user.dto';
 import { AuthGuard } from 'src/nest/guards/auth.guard';
 import { CurrentUser } from './decorator/current-user.decorator';
+import { UserListDto } from './dtos/user-list.dto';
 
 @Controller('users')
 @UseGuards(AuthGuard)
-@Serialize(UserDto)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
+  @Serialize(UserListDto)
   findAll() {
     return this.usersService.findAll();
   }
@@ -23,11 +24,13 @@ export class UsersController {
   // }
 
   @Get('/current-user')
+  @Serialize(UserDto)
   getCurrentUser(@CurrentUser() user){
     return user
   }
 
   @Patch('/user')
+  @Serialize(UserDto)
   update(@Body() updateUserDto: UpdateUserDto, @CurrentUser() user) {
     return this.usersService.update(user.id, updateUserDto);
   }
