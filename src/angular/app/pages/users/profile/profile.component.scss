@@ -1,0 +1,25 @@
+.profile-wrapper{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 80vh;
+}
+
+.profile-container{
+  padding: 2rem;
+  width: 500px;
+  margin: 0 auto;
+  .form-col{
+    margin: 10px 0;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    label{
+      width: 40%;
+    }
+
+    div.form-control{
+      border: unset;
+    }
+  }
+}

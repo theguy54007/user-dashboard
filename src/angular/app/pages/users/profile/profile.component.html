@@ -1,0 +1,37 @@
+
+<div class="profile-wrapper">
+  <div class="container">
+    <div class="row">
+      <div class="card profile-container">
+        <!-- Card header -->
+        <div class="card-header">
+          <h3>Profile Details</h3>
+        </div>
+        <div class="card-body">
+          <div *ngIf="form">
+            <!-- Form -->
+            <form class="row" [formGroup]="form" (ngSubmit)="onSubmit()">
+
+              <div class="form-col">
+                <label class="form-label" for="fname">email</label>
+                <div class="form-control">{{user.email}}</div>
+              </div>
+              <div class="form-col">
+                <label class="form-label" for="name">Name</label>
+                <input type="text" id="name" name="name" class="form-control" placeholder="name" formControlName="name">
+              </div>
+              <div class="col-12">
+                <!-- Button -->
+                <button class="btn btn-primary" type="submit">
+                  Update
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
