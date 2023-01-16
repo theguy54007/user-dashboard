@@ -1,17 +1,18 @@
-import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import { ForbiddenException, HttpException, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from 'src/nest/users/users.service';
 import { HashingService } from '../hashing/hashing.service';
-import { SignInDto } from './dto/sign-in.dto/sign-in.dto';
-import { SignUpDto } from './dto/sign-up.dto/sign-up.dto';
+import { SignInDto } from './dto/sign-in.dto';
+import { SignUpDto } from './dto/sign-up.dto';
 import { JwtService } from '@nestjs/jwt';
 import jwtConfig from '../../../../config/jwt.config';
 import { ConfigService, ConfigType } from '@nestjs/config';
 import { ActiveUserData } from './interfaces/active-user-data.interface';
 import { User } from '../user.entity';
 import { SendgridService } from 'src/nest/sendgrid/sendgrid.service';
-import { catchError, flatMap, from, of, tap } from 'rxjs';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { TemplateKey } from 'src/nest/sendgrid/sendgrid.constants';
+import { ResetForgotPasswordDto } from './dto/reset-forgot-password.dto';
+import { lastValueFrom } from 'rxjs';
 
 @Injectable()
 export class AuthenticationService {
@@ -31,7 +32,8 @@ export class AuthenticationService {
     const password  = await this.hashingService.hash(signUpDto.password);
 
     const user = await this.userService.create({email, password});
-    // await this.sendVerificationEmail(user)
+
+    await this.generateTokenAndSendVerificationMail(user)
     return user;
   }
 
@@ -49,6 +51,10 @@ export class AuthenticationService {
     );
     if (!isEqual) {
       throw new UnauthorizedException('Password does not match');
+    }
+
+    if (!user.emailVerified) {
+      throw new ForbiddenException("User's email is not verified")
     }
 
     return user
@@ -77,10 +83,14 @@ export class AuthenticationService {
     return payload
   }
 
-  async sendVerificationEmail(user: User){
-    const token = await this.generateTokens(user, 300)
-    const link = '/auth/verify-email?token=' + token.accessToken
-    return this.sendMail('SENDGRID_MAIL_VERIFICATION_TEMPLATE', link,  'sage.ts920126@gmail.com')
+  async sendVerificationEmail(email: string){
+    const user = await this.userService.findOneBy({email})
+    if (!user) {
+      throw new UnauthorizedException('User does not exists');
+    }
+
+    const result = await this.generateTokenAndSendVerificationMail(user)
+    return result
   }
 
   async sendResetPasswordEmail(email: string){
@@ -95,15 +105,47 @@ export class AuthenticationService {
     return this.sendMail('SENDGRID_RESET_PASSWORD_MAIL_TEMPLATE', link,  email)
   }
 
-  async resetPassword(resetPasswordDto: ResetPasswordDto){
-    const { email, password } = resetPasswordDto
-    const user = await this.userService.findOneBy({email})
-
-    if (!user) {
-      throw new UnauthorizedException('User does not exists');
+  async verifyEmail(token: string){
+    try {
+      const payload = await this.decryptToken(token)
+      const user = await this.userService.findOne(+payload.sub);
+      return this.userService.update(user.id, { emailVerified: true })
+    } catch {
+      throw new UnauthorizedException('token is invalid or expired, please login and resend verification email again.');
     }
+  }
 
+  async resetPassword(user: User, resetPasswordDto: ResetPasswordDto){
+    const oldPassword = await this.hashingService.hash(resetPasswordDto.oldPassword);
+    const isEqual = await this.hashingService.compare(
+      oldPassword,
+      user.password,
+    );
+
+    if (!isEqual) throw new UnauthorizedException('the old Password is invalid')
+
+    const password  = await this.hashingService.hash(resetPasswordDto.password);
     this.userService.update(user.id, { password })
+  }
+
+  async resetForgotPassword(token: string, resetPasswordDto: ResetForgotPasswordDto){
+    try {
+      const payload = await this.decryptToken(token)
+      const user = await this.userService.findOne(+payload.sub);
+      if (!user) {
+        throw new UnauthorizedException('User does not exists');
+      }
+      const password  = await this.hashingService.hash(resetPasswordDto.password);
+      this.userService.update(user.id, { password })
+    } catch {
+      throw new UnauthorizedException('token is invalid or expired, please try again by submitting email at forgot password page.');
+    }
+  }
+
+  private async generateTokenAndSendVerificationMail(user: User){
+    const token = await this.generateTokens(user, 300)
+    const link = '/auth/verify-email/' + token.accessToken
+    return this.sendMail('SENDGRID_MAIL_VERIFICATION_TEMPLATE', link,  'sage.ts920126@gmail.com')
   }
 
   private async signToken<T>(userId: number, expiresIn: number, payload?: T) {
@@ -136,6 +178,6 @@ export class AuthenticationService {
       ]
     };
 
-    return this.sendgridService.send(msg)
+    return lastValueFrom(this.sendgridService.send(msg))
   }
 }
