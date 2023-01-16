@@ -2,8 +2,8 @@ import { Expose } from "class-transformer";
 
 export class UserDto{
 
-  @Expose()
-  id: number;
+  // @Expose()
+  // id: number;
 
   @Expose()
   email: string;
@@ -11,6 +11,6 @@ export class UserDto{
   @Expose()
   name: string;
 
-  @Expose()
-  emailVerified: boolean;
+  // @Expose()
+  // emailVerified: boolean;
 }
