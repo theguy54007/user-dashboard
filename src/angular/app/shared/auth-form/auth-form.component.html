@@ -1,0 +1,59 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <div *ngIf="form.get('email')" class="form-floating mb-3">
+    <input
+      type="email"
+      class="form-control"
+      name="email"
+      id="floatingInput"
+      formControlName="email"
+      placeholder="name@example.com">
+    <label for="floatingInput">Email address</label>
+    <div *ngIf="formType !== 'login' && errorMessage('email')" class="invalid-feedback">
+      Please Insert valid email
+    </div>
+  </div>
+  <div *ngIf="form.get('oldPassword')" class="form-floating mb-3">
+    <input
+      type="password"
+      class="form-control"
+      name="oldPassword"
+      id="floatingPassword0"
+      formControlName="oldPassword"
+      placeholder="Password">
+    <label for="floatingPassword0">Old Password</label>
+  </div>
+  <div *ngIf="form.get('password')" class="form-floating mb-3">
+    <input
+      type="password"
+      class="form-control"
+      name="password"
+      id="floatingPassword"
+      formControlName="password"
+      placeholder="Password">
+    <label for="floatingPassword">Password</label>
+    <div *ngIf="errorMessage('password')" class="invalid-feedback">
+       {{ formContent[formType].passwordInvalid }}
+    </div>
+  </div>
+
+  <div *ngIf="form.get('passwordConfirmation')" class="form-floating mb-3">
+    <input
+      type="password"
+      class="form-control"
+      name="passwordConfirmation"
+      formControlName="passwordConfirmation"
+      id="floatingPassword2"
+      placeholder="passwordConfirmation">
+    <label for="floatingPassword2">Confirm Password</label>
+    <div *ngIf="errorMessage('passwordConfirmation')" class="invalid-feedback">
+      please confirm both password is same
+    </div>
+  </div>
+
+  <div *ngIf="!hiddenSubmit" class="d-grid">
+    <button
+      class="btn btn-primary btn-login text-uppercase fw-bold"
+      type="submit"
+      [disabled]="!form.valid">{{ formContent[formType].submit }}</button>
+  </div>
+</form>
