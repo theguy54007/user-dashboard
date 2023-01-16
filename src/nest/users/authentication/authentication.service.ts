@@ -39,7 +39,7 @@ export class AuthenticationService {
 
   async signIn(signInDto: SignInDto){
     const { email, password } = signInDto
-    const user = await this.userService.findOneBy({email})
+    let user = await this.userService.findOneBy({email})
 
     if (!user) {
       throw new UnauthorizedException('User does not exists');
@@ -57,6 +57,10 @@ export class AuthenticationService {
       throw new ForbiddenException("User's email is not verified")
     }
 
+    const updatedAttr = {
+      signInCount: user.signInCount + 1
+    }
+    user = await this.userService.update(user.id, updatedAttr)
     return user
   }
 
@@ -108,8 +112,14 @@ export class AuthenticationService {
   async verifyEmail(token: string){
     try {
       const payload = await this.decryptToken(token)
-      const user = await this.userService.findOne(+payload.sub);
-      return this.userService.update(user.id, { emailVerified: true })
+      let user = await this.userService.findOne(+payload.sub);
+
+      const updatedAttr = {
+        emailVerified: true,
+        signInCount: user.signInCount + 1
+      }
+      user = await this.userService.update(user.id, updatedAttr)
+      return user
     } catch {
       throw new UnauthorizedException('token is invalid or expired, please login and resend verification email again.');
     }
