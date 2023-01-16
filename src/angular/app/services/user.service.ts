@@ -17,4 +17,8 @@ export class UserService {
   getCurrentUser(){
     return this.apiService.get('users/current-user')
   }
+
+  dashboardUsers(){
+    return this.apiService.get('users')
+  }
 }

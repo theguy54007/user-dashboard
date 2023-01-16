@@ -13,6 +13,7 @@ import { AuthFormComponent } from './shared/auth-form/auth-form.component';
 import { ResetPasswordComponent } from './pages/auth/reset-password/reset-password.component';
 import { VerifyEmailComponent } from './pages/auth/verify-email/verify-email.component';
 import { ProfileComponent } from './pages/users/profile/profile.component';
+import { DashboardComponent } from './pages/dashboard/dashboard.component';
 
 @NgModule({
   declarations: [
@@ -21,7 +22,8 @@ import { ProfileComponent } from './pages/users/profile/profile.component';
     AuthComponent,
     ResetPasswordComponent,
     VerifyEmailComponent,
-    ProfileComponent
+    ProfileComponent,
+    DashboardComponent
   ],
   imports: [
     BrowserModule,

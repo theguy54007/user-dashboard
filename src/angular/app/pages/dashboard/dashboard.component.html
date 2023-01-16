@@ -1,0 +1,21 @@
+<div class="card shadow container mt-4">
+  <table id="datatable" class="table table-striped">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Sign Up At</th>
+        <th>Total Login</th>
+        <!-- <th>Last Session At</th> -->
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let user of users">
+        <th>{{user.name}}</th>
+        <th>{{user.email}}</th>
+        <th>{{user.createdAt}}</th>
+        <th>{{user.signInCount}}</th>
+      </tr>
+    </tbody>
+  </table>
+</div>
