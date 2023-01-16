@@ -21,7 +21,7 @@ export class CurrentUserMiddleware implements NestMiddleware {
   ){}
 
   async use(req: Request, res: Response, next: NextFunction) {
-    const { accessToken }  = req.session || {};
+    const { accessToken }  = req.cookies || {};
 
     if (accessToken) {
       try {
