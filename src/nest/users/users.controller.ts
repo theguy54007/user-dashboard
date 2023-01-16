@@ -22,8 +22,8 @@ export class UsersController {
   //   return this.usersService.findOne(+id);
   // }
 
-  @Get('/me')
-  getMe(@CurrentUser() user){
+  @Get('/current-user')
+  getCurrentUser(@CurrentUser() user){
     return user
   }
 
