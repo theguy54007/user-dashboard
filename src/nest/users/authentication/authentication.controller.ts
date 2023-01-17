@@ -6,11 +6,11 @@ import { CurrentUser } from '../decorator/current-user.decorator';
 import { UserDto } from '../dtos/user.dto';
 import { User } from '../user.entity';
 import { AuthenticationService } from './authentication.service';
-import { ResetForgotPasswordDto } from './dto/reset-forgot-password.dto';
-import { ResetPasswordDto } from './dto/reset-password.dto';
-import { SignInDto } from './dto/sign-in.dto';
-import { SignUpResponseDto } from './dto/sign-up-response.dto';
-import { SignUpDto } from './dto/sign-up.dto';
+import { ResetForgotPasswordDto } from './dtos/reset-forgot-password.dto';
+import { ResetPasswordDto } from './dtos/reset-password.dto';
+import { SignInDto } from './dtos/sign-in.dto';
+import { SignUpResponseDto } from './dtos/sign-up-response.dto';
+import { SignUpDto } from './dtos/sign-up.dto';
 
 @Controller('auth')
 export class AuthenticationController {
@@ -47,7 +47,7 @@ export class AuthenticationController {
 
   @Post('/sign-out')
   signOut(@Res({passthrough: true}) response: Response){
-    response.clearCookie('acccessToken')
+    response.clearCookie('accessToken')
   }
 
   @Post('/send-email-verification')
@@ -79,6 +79,7 @@ export class AuthenticationController {
   @Post('/reset-forgot-password')
   async resetForgotPassword(@Body() body: ResetForgotPasswordDto, @Headers('reset-token') token: string) {
     if (!token) throw new UnauthorizedException('missing reset token')
+
     await this.authService.resetForgotPassword(token, body)
     return {
       message: 'Reset done! Please login again with new password.'
@@ -89,7 +90,7 @@ export class AuthenticationController {
   @UseGuards(AuthGuard)
   async resetPassword(@Body() body: ResetPasswordDto, @CurrentUser() user: User, @Res({passthrough: true}) response: Response) {
     await this.authService.resetPassword(user, body)
-    response.clearCookie('acccessToken')
+    response.clearCookie('accessToken')
     return {
       message: 'Reset done! Please login again with new password.'
     }

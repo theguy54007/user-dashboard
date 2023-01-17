@@ -1,17 +1,17 @@
 import { ForbiddenException, HttpException, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from 'src/nest/users/users.service';
 import { HashingService } from '../hashing/hashing.service';
-import { SignInDto } from './dto/sign-in.dto';
-import { SignUpDto } from './dto/sign-up.dto';
+import { SignInDto } from './dtos/sign-in.dto';
+import { SignUpDto } from './dtos/sign-up.dto';
 import { JwtService } from '@nestjs/jwt';
 import jwtConfig from '../../../../config/jwt.config';
 import { ConfigService, ConfigType } from '@nestjs/config';
 import { ActiveUserData } from './interfaces/active-user-data.interface';
 import { User } from '../user.entity';
 import { SendgridService } from 'src/nest/sendgrid/sendgrid.service';
-import { ResetPasswordDto } from './dto/reset-password.dto';
+import { ResetPasswordDto } from './dtos/reset-password.dto';
 import { TemplateKey } from 'src/nest/sendgrid/sendgrid.constants';
-import { ResetForgotPasswordDto } from './dto/reset-forgot-password.dto';
+import { ResetForgotPasswordDto } from './dtos/reset-forgot-password.dto';
 import { lastValueFrom } from 'rxjs';
 
 @Injectable()
@@ -126,7 +126,7 @@ export class AuthenticationService {
   }
 
   async resetPassword(user: User, resetPasswordDto: ResetPasswordDto){
-    const oldPassword = await this.hashingService.hash(resetPasswordDto.oldPassword);
+    const { oldPassword } = resetPasswordDto
     const isEqual = await this.hashingService.compare(
       oldPassword,
       user.password,
@@ -148,7 +148,7 @@ export class AuthenticationService {
       const password  = await this.hashingService.hash(resetPasswordDto.password);
       this.userService.update(user.id, { password })
     } catch {
-      throw new UnauthorizedException('token is invalid or expired, please try again by submitting email at forgot password page.');
+      throw new UnauthorizedException('token is invalid or expired, please resend the email to try again.');
     }
   }
 

@@ -51,13 +51,14 @@ export class ResetPasswordComponent implements OnInit {
           },
           error: (err: HttpErrorResponse) => {
             const { message } = err.error || {}
-            if (message) this.authService.redirectToLogin({errorMessage: message})
-            // if (err.error?.message) this.toastrService.error()
+            if (err.status === 401) return this.authService.redirectToLogin({errorMessage: message})
+            if (message) this.toastrService.error(message)
           }
         })
       case 'resetPassword':
         return this.authService.resetPassword({oldPassword, password, passwordConfirmation}).subscribe({
           next: (res) => {
+            this.authService.logout()
             const {message} = res
             this.authService.redirectToLogin({message})
           },
