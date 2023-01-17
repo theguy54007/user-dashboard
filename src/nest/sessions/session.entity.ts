@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity('sessions')
 export class Session {
@@ -12,6 +12,7 @@ export class Session {
   action_name: string;
 
   @Column()
+  @Index()
   user_id: number
 
   @CreateDateColumn()
