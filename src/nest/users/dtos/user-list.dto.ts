@@ -9,7 +9,7 @@ export class UserListDto extends UserDto {
   @Expose({name: 'sign_in_count'})
   signInCount: number;
 
-  @Expose()
+  @Expose({name: 'last_session_at'})
   lastSessionAt: Date
 
 }

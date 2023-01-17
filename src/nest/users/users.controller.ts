@@ -18,6 +18,12 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
+  @Get('/with-last-session-at')
+  @Serialize(UserListDto)
+  withLastSessionAt() {
+    return this.usersService.findAllWIthLastSessionAt();
+  }
+
   // @Get(':id')
   // findOne(@Param('id') id: string) {
   //   return this.usersService.findOne(+id);
