@@ -1,5 +1,6 @@
-
-<div class="profile-wrapper">
+<app-header></app-header>
+<app-loading *ngIf="isLoading"></app-loading>
+<div *ngIf="!isLoading && form" class="profile-wrapper">
   <div class="container">
     <div class="row">
       <div class="card profile-container">
@@ -23,7 +24,10 @@
               <div class="col-12">
                 <!-- Button -->
                 <button class="btn btn-primary" type="submit">
-                  Update
+                  <span *ngIf="!isButtonLoading">
+                    Update
+                  </span>
+                  <app-loading *ngIf="isButtonLoading"></app-loading>
                 </button>
               </div>
             </form>
