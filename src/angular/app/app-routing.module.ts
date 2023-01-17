@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { AuthGuard } from './guards/auth.guard';
 import { AuthComponent } from './pages/auth/auth.component';
 import { ResetPasswordComponent } from './pages/auth/reset-password/reset-password.component';
 import { VerifyEmailComponent } from './pages/auth/verify-email/verify-email.component';
@@ -10,11 +11,13 @@ import { ProfileComponent } from './pages/users/profile/profile.component';
 const routes: Routes = [
   {
     path: '',
-    component: DashboardComponent
+    component: DashboardComponent,
+    canActivate: [AuthGuard]
   },
   {
     path: 'profile',
-    component: ProfileComponent
+    component: ProfileComponent,
+    canActivate: [AuthGuard]
   },
   {
     path: 'auth',
