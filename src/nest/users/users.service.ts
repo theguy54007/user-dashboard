@@ -47,6 +47,13 @@ export class UsersService {
   remove(id: number) {
     return `This action removes a #${id} user`;
   }
+
+  userStatistic(){
+    // Total number of users who have signed up.
+    // Total number of users with active sessions today.
+    // Average number of active session users in the last 7 days rolling.
+
+  }
 }
 
 

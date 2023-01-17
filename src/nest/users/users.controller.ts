@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, Request, NotFoundException, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateUserDto } from './dtos/update-user.dto';
 import { Serialize } from 'src/nest/interceptors/serialize.interceptor';
 import { UserDto } from './dtos/user.dto';
 import { AuthGuard } from 'src/nest/guards/auth.guard';

@@ -6,6 +6,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { SendgridModule } from './sendgrid/sendgrid.module';
+import { SessionsModule } from './sessions/sessions.module';
 
 const cookieSession = require('cookie-session')
 
@@ -30,8 +31,11 @@ const cookieSession = require('cookie-session')
     }),
     UsersModule,
     SendgridModule,
+    SessionsModule,
   ],
-  controllers: [AppController],
+  controllers: [
+    AppController
+  ],
   providers: [
     AppService,
     {
@@ -39,7 +43,7 @@ const cookieSession = require('cookie-session')
       useValue: new ValidationPipe({
         whitelist: true,
       })
-    },
+    }
   ],
 })
 export class AppModule {
