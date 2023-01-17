@@ -1,10 +1,10 @@
 import { HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { BehaviorSubject, tap } from 'rxjs';
+import { BehaviorSubject, of, tap } from 'rxjs';
 import { User } from '../model/user/user.model';
 import { ApiService } from './api.service';
-import { LocalStorageService } from './local-storage.service';
+import { UserService } from './user.service';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +14,7 @@ export class AuthService {
 
   constructor(
     private apiService: ApiService,
-    private localStorage: LocalStorageService,
+    private userService: UserService,
     private router: Router
   ) { }
 
@@ -66,16 +66,18 @@ export class AuthService {
   }
 
   autoSignIn(){
-    const userData: User = JSON.parse(localStorage.getItem('userData'))
-    if (!userData) {
-      return;
-    }
-
-    this.user.next(new User(userData))
+    this.userService.getCurrentUser().subscribe({
+      next: (res: User) => {
+        this.addNewUser(res)
+      },
+      error: err => {
+        this.addNewUser(null)
+        return of({})
+      }
+    })
   }
 
   addNewUser(user){
-    this.localStorage.setItem('userData', JSON.stringify(user))
     this.user.next(new User(user))
   }
 
@@ -84,7 +86,11 @@ export class AuthService {
   }
 
   logout(){
-    this.localStorage.removeItem('userData')
+    this.user.next(null)
+  }
+
+  isAuthenticated(){
+    return !!this.user
   }
 }
 
