@@ -53,12 +53,12 @@ export class AuthenticationService {
       throw new UnauthorizedException('Password does not match');
     }
 
-    if (!user.emailVerified) {
+    if (!user.email_verified) {
       throw new ForbiddenException("User's email is not verified")
     }
 
     const updatedAttr = {
-      signInCount: user.signInCount + 1
+      sign_in_count: user.sign_in_count + 1
     }
     user = await this.userService.update(user.id, updatedAttr)
     return user
@@ -115,8 +115,8 @@ export class AuthenticationService {
       let user = await this.userService.findOne(+payload.sub);
 
       const updatedAttr = {
-        emailVerified: true,
-        signInCount: user.signInCount + 1
+        email_verified: true,
+        sign_in_count: user.sign_in_count + 1
       }
       user = await this.userService.update(user.id, updatedAttr)
       return user

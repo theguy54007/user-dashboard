@@ -29,7 +29,8 @@ export class CurrentUserMiddleware implements NestMiddleware {
         const user = await this.usersService.findOne(+payload.sub);
         req.currentUser = user;
       } catch {
-        req.session.accessToken = null;
+        // req.accessToken = null;
+        req.cookies.accessToken = null;
       }
     }
     next();

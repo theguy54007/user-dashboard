@@ -9,11 +9,11 @@ export class Session {
   @Column({
     nullable: true
   })
-  actionName: string;
+  action_name: string;
 
   @Column()
   user_id: number
 
   @CreateDateColumn()
-  createdAt: Date;
+  created_at: Date;
 }

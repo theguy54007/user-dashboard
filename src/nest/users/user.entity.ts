@@ -18,14 +18,14 @@ export class User {
   password: string;
 
   @Column({default: false})
-  emailVerified: Boolean
+  email_verified: Boolean
 
   @Column({default: 0})
-  signInCount: number;
+  sign_in_count: number;
 
   @CreateDateColumn()
-  createdAt: Date;
+  created_at: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updated_at: Date;
 }

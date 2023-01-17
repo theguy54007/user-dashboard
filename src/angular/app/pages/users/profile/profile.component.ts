@@ -30,7 +30,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
       next: user => {
         this.user = user
 
-        if (this.user?.name) {
+        if (this.user) {
           this.form = new FormGroup({
             name: new FormControl(this.user.name, Validators.required)
           })

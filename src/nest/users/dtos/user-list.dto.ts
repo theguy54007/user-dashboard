@@ -1,12 +1,12 @@
-import { Expose } from "class-transformer";
+import { Expose, Transform } from "class-transformer";
 import { UserDto } from "./user.dto";
 
 export class UserListDto extends UserDto {
 
-  @Expose()
+  @Expose({name: 'created_at'})
   createdAt: Date;
 
-  @Expose()
+  @Expose({name: 'sign_in_count'})
   signInCount: number;
 
   @Expose()
