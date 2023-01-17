@@ -1,5 +1,5 @@
 import { HttpClientModule } from '@angular/common/http';
-import { NgModule } from '@angular/core';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { CookieService } from 'ngx-cookie-service';
@@ -14,6 +14,10 @@ import { ResetPasswordComponent } from './pages/auth/reset-password/reset-passwo
 import { VerifyEmailComponent } from './pages/auth/verify-email/verify-email.component';
 import { ProfileComponent } from './pages/users/profile/profile.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
+import { fetchCurrentUserFactory } from './services/current-user.service';
+import { AuthService } from './services/auth.service';
+import { HeaderComponent } from './shared/header/header.component';
+import { LoadingComponent } from './shared/loading/loading.component';
 
 @NgModule({
   declarations: [
@@ -23,7 +27,9 @@ import { DashboardComponent } from './pages/dashboard/dashboard.component';
     ResetPasswordComponent,
     VerifyEmailComponent,
     ProfileComponent,
-    DashboardComponent
+    DashboardComponent,
+    HeaderComponent,
+    LoadingComponent
   ],
   imports: [
     BrowserModule,
@@ -33,7 +39,15 @@ import { DashboardComponent } from './pages/dashboard/dashboard.component';
     ToastrModule.forRoot(),
     BrowserAnimationsModule
   ],
-  providers: [CookieService],
+  providers: [
+    CookieService,
+    {
+      provide: APP_INITIALIZER,
+      useFactory: fetchCurrentUserFactory,
+      deps: [AuthService],
+      multi: true
+    }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
