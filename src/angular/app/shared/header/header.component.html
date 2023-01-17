@@ -1,0 +1,23 @@
+<header class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
+  <div class="title d-flex align-items-center col-md-3 mb-2 mb-md-0 text-dark text-decoration-none">
+    User Dashboard
+  </div>
+
+  <ul class="nav nav-pills col-12 col-md-auto mb-2 justify-content-center mb-md-0">
+    <li class="nav-item">
+      <a routerLink="/" routerLinkActive="active" class="nav-link" aria-current="page" [routerLinkActiveOptions]="{exact: true}">Home</a>
+    </li>
+    <li class="nav-item">
+      <a routerLink="/profile" routerLinkActive="active" class="nav-link">Profile</a>
+    </li>
+    <li class="nav-item">
+      <a routerLink="/auth/reset-password" routerLinkActive="active" class="nav-link">Reset Password</a>
+    </li>
+  </ul>
+
+  <div class="col-md-3 text-end">
+    <button *ngIf="user" type="button" class="btn btn-outline-primary me-2" (click)="onLogout()">Logout | {{ user.email }}</button>
+    <button *ngIf="!user" type="button" class="btn btn-primary" routerLink="/auth/sign-in">Login</button>
+  </div>
+
+</header>
