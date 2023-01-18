@@ -1,4 +1,5 @@
-import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { User } from "../users/user.entity";
 
 @Entity('sessions')
 export class Session {
@@ -6,15 +7,17 @@ export class Session {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({
-    nullable: true
-  })
-  action_name: string;
+  @ManyToOne(() => User, (user) => user.sessions)
+  @JoinColumn({name: 'user_id'})
+  @Index()
+  user: User
 
   @Column()
-  @Index()
-  user_id: number
+  auth_token: string
 
-  @CreateDateColumn()
+  @CreateDateColumn({type: 'timestamptz'})
   created_at: Date;
+
+  @Column({type: 'timestamptz'})
+  end_at: Date;
 }

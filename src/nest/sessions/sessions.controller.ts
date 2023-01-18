@@ -16,6 +16,6 @@ export class SessionsController {
   @Post()
   createSession(@Body() body: Partial<CreateSessionDto>, @CurrentUser() user: User){
     const user_id = user.id
-    return this.sessionService.create(Object.assign(body, { user_id }))
+    // return this.sessionService.create(Object.assign(body, { user_id }))
   }
 }
