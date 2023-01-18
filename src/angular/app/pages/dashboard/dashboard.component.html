@@ -1,4 +1,21 @@
 <app-header></app-header>
+<div *ngIf="statistic" class="statistic-container">
+  <div class="card show">
+    <app-loading *ngIf="!statistic.total"></app-loading>
+    <h5>Total number of users who have signed up.</h5>
+    <p>{{ statistic.total }}</p>
+  </div>
+  <div class="card show">
+    <app-loading *ngIf="!statistic.activeToday"></app-loading>
+    <h5>Total number of users with active sessions today.</h5>
+    <p>{{ statistic.activeToday }}</p>
+  </div>
+  <div class="card show">
+    <app-loading *ngIf="!statistic.average7day"></app-loading>
+    <h5>Average number of active session users in the last 7 days rolling.</h5>
+    <p>{{ statistic.average7day }}</p>
+  </div>
+</div>
 <div class="card shadow container mt-4">
   <table id="datatable" class="table table-striped">
     <thead>
@@ -7,7 +24,7 @@
         <th>Email</th>
         <th>Sign Up At</th>
         <th>Total Login</th>
-        <!-- <th>Last Session At</th> -->
+        <th>Last Session At</th>
       </tr>
     </thead>
     <tbody>
@@ -16,6 +33,7 @@
         <th>{{user.email}}</th>
         <th>{{user.createdAt}}</th>
         <th>{{user.signInCount}}</th>
+        <th>{{user.lastSessionAt}}</th>
       </tr>
     </tbody>
   </table>
