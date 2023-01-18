@@ -1,6 +1,7 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import * as moment from 'moment';
+import { MoreThan, Repository } from 'typeorm';
 import { Session } from '../sessions/session.entity';
 import { User } from './user.entity';
 
@@ -31,11 +32,23 @@ export class UsersService {
   findAll() {
     return this.repo.createQueryBuilder()
                     .getMany()
-
   }
 
   findOne(id: number) {
     return this.repo.findOneBy({id: id})
+  }
+
+  async findOneBySession(auth_token: string){
+    const user = await this.repo.findOne({
+      relations: ['sessions'],
+      where: {
+        sessions: {
+          auth_token,
+          end_at: MoreThan( moment().toDate() )
+        }
+      }
+    })
+    return user
   }
 
   async update(id: number, attrs: Partial<User>){
@@ -68,11 +81,61 @@ export class UsersService {
     return await query.getRawMany();
   }
 
-  userStatistic(){
+  async statistic(){
     // Total number of users who have signed up.
-    // Total number of users with active sessions today.
-    // Average number of active session users in the last 7 days rolling.
+    const total = await this.repo.count()
 
+    // Total number of users with active sessions today.
+    const activeToday = await this.getActiveUsersToday()
+
+    // Average number of active session users in the last 7 days rolling.
+    const average7day = await this.getAvgActiveUsersLast7Days()
+
+    return {
+      total,
+      activeToday,
+      average7day
+    }
+  }
+
+  private async getActiveUsersToday(){
+    const today = new Date();
+    const startOfToday = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate(),
+    );
+    const endOfToday = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate() + 1,
+    );
+
+    const activeUsers = await this.sessionRepo
+      .createQueryBuilder('session')
+      .select('COUNT(DISTINCT session.user_id)', 'count')
+      .where('session.end_at > :today', {today})
+      .andWhere('session.created_at BETWEEN :startOfToday AND :endOfToday', { startOfToday, endOfToday })
+      .getRawOne();
+
+    return +activeUsers.count;
+  }
+
+  private async getAvgActiveUsersLast7Days(){
+
+    const today = new Date();
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+    const activeUsers = await this.sessionRepo.createQueryBuilder('session')
+      .select('COUNT(DISTINCT session.user_id)', 'activeUsers')
+      .addSelect('Date(session.end_at)', 'end_day')
+      .where('session.end_at BETWEEN :sevenDaysAgo and :today', { today, sevenDaysAgo })
+      .groupBy('end_day')
+      .getRawMany();
+
+    const avgActiveUsers = activeUsers.reduce((sum, row) => sum + +row.activeUsers, 0)/7
+    return avgActiveUsers;
   }
 }
 

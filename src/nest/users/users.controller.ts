@@ -6,6 +6,7 @@ import { UserDto } from './dtos/user.dto';
 import { AuthGuard } from 'src/nest/guards/auth.guard';
 import { CurrentUser } from './decorator/current-user.decorator';
 import { UserListDto } from './dtos/user-list.dto';
+import { UserStatistic } from './dtos/user-statistic.dto';
 
 @Controller('users')
 @UseGuards(AuthGuard)
@@ -22,6 +23,12 @@ export class UsersController {
   @Serialize(UserListDto)
   withLastSessionAt() {
     return this.usersService.findAllWIthLastSessionAt();
+  }
+
+  @Get('/statistic')
+  @Serialize(UserStatistic)
+  statistic(){
+    return this.usersService.statistic()
   }
 
   // @Get(':id')
