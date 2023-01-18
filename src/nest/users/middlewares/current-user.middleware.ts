@@ -26,7 +26,7 @@ export class CurrentUserMiddleware implements NestMiddleware {
     if (accessToken) {
       try {
         const payload = await this.authServcie.decryptToken(accessToken)
-        const user = await this.usersService.findOne(+payload.sub);
+        const user = await this.usersService.findOneBySession(payload.sub)
         req.currentUser = user;
       } catch {
         // req.accessToken = null;

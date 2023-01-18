@@ -13,6 +13,7 @@ import { ResetPasswordDto } from './dtos/reset-password.dto';
 import { TemplateKey } from 'src/nest/sendgrid/sendgrid.constants';
 import { ResetForgotPasswordDto } from './dtos/reset-forgot-password.dto';
 import { lastValueFrom } from 'rxjs';
+import { SessionsService } from 'src/nest/sessions/sessions.service';
 
 @Injectable()
 export class AuthenticationService {
@@ -20,6 +21,7 @@ export class AuthenticationService {
   constructor(
     private userService: UsersService,
     private hashingService: HashingService,
+    private sessionService: SessionsService,
     private sendgridService: SendgridService,
     private configService: ConfigService,
     private readonly jwtService: JwtService,
@@ -57,26 +59,26 @@ export class AuthenticationService {
       throw new ForbiddenException("User's email is not verified")
     }
 
-    const updatedAttr = {
-      sign_in_count: user.sign_in_count + 1
-    }
-    user = await this.userService.update(user.id, updatedAttr)
-    return user
+    return await this.signInUser(user)
   }
 
-  async generateTokens(user: User, expiresIn?: number) {
-    const [accessToken] = await Promise.all([
-      this.signToken<Partial<ActiveUserData>>(
-        user.id,
-        expiresIn || this.jwtConfiguration.accessTokenTtl,
-        { email: user.email },
-      )
-    ]);
-
-    return {
-      accessToken
-    };
+  async signOut(user_id: number){
+    const session = await this.sessionService.findOneActiveBy({ user: {id: user_id }})
+    this.sessionService.updateEndAt(session.id)
   }
+
+  // async generateTokens(sub: number, expiresIn?: number) {
+  //   const [accessToken] = await Promise.all([
+  //     this.signToken<Partial<ActiveUserData>>(
+  //       sub,
+  //       expiresIn || this.jwtConfiguration.accessTokenTtl,
+  //     )
+  //   ]);
+
+  //   return {
+  //     accessToken
+  //   };
+  // }
 
   async decryptToken(token: string){
     const payload = await this.jwtService.verifyAsync(
@@ -103,8 +105,8 @@ export class AuthenticationService {
       throw new UnauthorizedException('User does not exists');
     }
 
-    const token = await this.generateTokens(user, 300)
-    const link =  '/auth/reset-password?token=' + token.accessToken
+    const resetToken = await this.signToken(user.id, 300)
+    const link =  '/auth/reset-password?token=' + resetToken
 
     return this.sendMail('SENDGRID_RESET_PASSWORD_MAIL_TEMPLATE', link,  email)
   }
@@ -115,11 +117,9 @@ export class AuthenticationService {
       let user = await this.userService.findOne(+payload.sub);
 
       const updatedAttr = {
-        email_verified: true,
-        sign_in_count: user.sign_in_count + 1
+        email_verified: true
       }
-      user = await this.userService.update(user.id, updatedAttr)
-      return user
+      return await this.signInUser(user, updatedAttr)
     } catch {
       throw new UnauthorizedException('token is invalid or expired, please login and resend verification email again.');
     }
@@ -136,6 +136,7 @@ export class AuthenticationService {
 
     const password  = await this.hashingService.hash(resetPasswordDto.password);
     this.userService.update(user.id, { password })
+    await this.signOut(user.id)
   }
 
   async resetForgotPassword(token: string, resetPasswordDto: ResetForgotPasswordDto){
@@ -152,23 +153,42 @@ export class AuthenticationService {
     }
   }
 
+  private async signInUser(user: User, updatedAttr?: Partial<User>){
+    updatedAttr =  updatedAttr ?? {}
+
+    const attr = {
+      ...updatedAttr,
+      sign_in_count: user.sign_in_count + 1
+    }
+    user = await this.userService.update(user.id, attr)
+
+    const session = await this.sessionService.create({ user_id: user.id });
+    const  accessToken  = await this.signToken(session.auth_token)
+    return {
+      user,
+      accessToken
+    }
+  }
+
   private async generateTokenAndSendVerificationMail(user: User){
-    const token = await this.generateTokens(user, 300)
-    const link = '/auth/verify-email/' + token.accessToken
+    const token = await this.signToken(user.id, 300)
+    const link = '/auth/verify-email/' + token
     return this.sendMail('SENDGRID_MAIL_VERIFICATION_TEMPLATE', link,  'sage.ts920126@gmail.com')
   }
 
-  private async signToken<T>(userId: number, expiresIn: number, payload?: T) {
+  private async signToken(
+    sub: number | string,
+    expiresIn: number = (this.jwtConfiguration.accessTokenTtl/1000)
+  ) {
     return await this.jwtService.signAsync(
       {
-        sub: userId,
-        ...payload,
+        sub: sub,
       },
       {
         audience: this.jwtConfiguration.audience,
         issuer: this.jwtConfiguration.issuer,
         secret: this.jwtConfiguration.secret,
-        expiresIn,
+        expiresIn
       },
     );
   }

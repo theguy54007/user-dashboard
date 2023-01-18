@@ -13,6 +13,7 @@ import { ConfigModule } from '@nestjs/config';
 import { CurrentUserMiddleware } from './middlewares/current-user.middleware';
 import { SendgridModule } from 'src/nest/sendgrid/sendgrid.module';
 import { Session } from '../sessions/session.entity';
+import { SessionsService } from '../sessions/sessions.service';
 
 @Module({
   imports: [
@@ -31,7 +32,8 @@ import { Session } from '../sessions/session.entity';
       useClass: BcryptService
     },
     UsersService,
-    AuthenticationService
+    AuthenticationService,
+    SessionsService
   ]
 })
 export class UsersModule {
