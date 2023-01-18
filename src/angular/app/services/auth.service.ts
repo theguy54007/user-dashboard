@@ -1,7 +1,7 @@
 import { HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { BehaviorSubject, of, tap } from 'rxjs';
+import { BehaviorSubject, catchError, of, tap } from 'rxjs';
 import { User } from '../model/user/user.model';
 import { ApiService } from './api.service';
 import { UserService } from './user.service';
@@ -46,9 +46,7 @@ export class AuthService {
   }
 
   verifyEmail(verifyToken: string){
-    return this.apiService.post('auth/verify-email', {
-      verifyToken
-    })
+    return this.apiService.post('auth/verify-email', { verifyToken })
   }
 
   sendResetPasswordMail(email: string){
@@ -66,31 +64,27 @@ export class AuthService {
   }
 
   autoSignIn(){
-    this.userService.getCurrentUser().subscribe({
-      next: (res: User) => {
-        this.addNewUser(res)
-      },
-      error: err => {
+    return this.userService.getCurrentUser().pipe(
+      tap((user: User) => {
+        this.addNewUser(user)
+      }),
+      catchError(_ => {
         this.addNewUser(null)
         return of({})
-      }
-    })
+      })
+    )
   }
 
   addNewUser(user){
     this.user.next(new User(user))
   }
 
-  redirectToLogin(options: {message?: string, errorMessage?: string}){
-    this.router.navigate(['auth', 'sign-in'], {state: options})
+  redirectToLogin(){
+    this.router.navigate(['auth', 'sign-in'])
   }
 
   logout(){
     this.user.next(null)
-  }
-
-  isAuthenticated(){
-    return !!this.user
   }
 }
 

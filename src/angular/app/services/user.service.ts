@@ -18,7 +18,11 @@ export class UserService {
     return this.apiService.get('users/current-user')
   }
 
-  dashboardUsers(){
-    return this.apiService.get('users')
+  listWithLastSessionAt(){
+    return this.apiService.get('users/with-last-session-at')
+  }
+
+  getStatistics(){
+    return this.apiService.get('users/statistic')
   }
 }

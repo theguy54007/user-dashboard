@@ -2,8 +2,8 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { ToastrService } from 'ngx-toastr';
 import { AuthService } from 'src/angular/app/services/auth.service';
+import { ToastrNoticeService } from 'src/angular/app/services/toastr-notice.service';
 import { AuthFormType } from 'src/angular/app/shared/auth-form/auth-form.component';
 
 @Component({
@@ -19,7 +19,7 @@ export class ResetPasswordComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private route: ActivatedRoute,
-    private toastrService: ToastrService
+    private toastrNotice: ToastrNoticeService
   ) { }
 
   ngOnInit(): void {
@@ -46,30 +46,41 @@ export class ResetPasswordComponent implements OnInit {
       case 'resetForgotPassword':
         return this.authService.resetForgotPassword({ password, passwordConfirmation }, this.resetToken).subscribe({
           next: (res) => {
-            const {message} = res
-            this.authService.redirectToLogin({message})
+            const { message } = res
+            this.toastrNotice.addMessage({ notice: message })
+            this.authService.redirectToLogin()
           },
           error: (err: HttpErrorResponse) => {
             const { message } = err.error || {}
-            if (err.status === 401) return this.authService.redirectToLogin({errorMessage: message})
-            if (message) this.toastrService.error(message)
+            if (message) this.alertErrorMessage(message)
+
+            if (err.status === 401) {
+              return this.authService.redirectToLogin()
+            }
+
           }
         })
       case 'resetPassword':
         return this.authService.resetPassword({oldPassword, password, passwordConfirmation}).subscribe({
           next: (res) => {
             this.authService.logout()
-            const {message} = res
-            this.authService.redirectToLogin({message})
+            const { message } = res
+            this.toastrNotice.addMessage({ notice: message })
+            this.authService.redirectToLogin()
           },
           error: (err: HttpErrorResponse) => {
             if (err.status === 403) {
-              this.authService.redirectToLogin({errorMessage: 'please login before reset password'});
+              this.toastrNotice.addMessage({ error: 'please login before reset password' })
+              return this.authService.redirectToLogin();
             }
-            if (err.error?.message) this.toastrService.error(err.error.message)
+            if (err.error?.message) this.alertErrorMessage(err.error.message)
           }
         })
     }
+  }
+
+  private alertErrorMessage(error: string){
+    this.toastrNotice.addMessage({ error })
   }
 
 }

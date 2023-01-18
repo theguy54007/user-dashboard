@@ -1,41 +1,31 @@
-import { HttpErrorResponse } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
-import { NavigationEnd, Router } from '@angular/router';
-import { ToastrService } from 'ngx-toastr';
-import { AuthService } from './services/auth.service';
-import { SessionService } from './services/session.service';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ActivationEnd, NavigationEnd, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
+import { ToastrNoticeService } from './services/toastr-notice.service';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
   title = 'user-dashboard';
+  noticeSub: Subscription
 
   constructor(
-    private authService: AuthService,
-    private sessionService: SessionService,
-    private router: Router,
+    private toastrNotice: ToastrNoticeService
   ){}
 
   ngOnInit(){
-    this.router.events.subscribe( ev => {
-      if (ev instanceof NavigationEnd) {
-        const paths = ev.url.split('/')
-
-        if (!paths.includes('auth')) {
-          this.sessionService.createSession(paths[(paths.length - 1)]).subscribe({
-            error: (err: HttpErrorResponse) => {
-              if (err.status === 403) {
-                this.authService.redirectToLogin({errorMessage: 'please login before you proceed.'})
-              }
-            }
-          })
-        }
-
+    this.noticeSub = this.toastrNotice.messages.subscribe({
+      next: (msg) => {
+        this.toastrNotice.showMessage(msg)
       }
     })
+  }
+
+  ngOnDestroy(): void {
+    this.noticeSub.unsubscribe()
   }
 
 }

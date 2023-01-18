@@ -1,10 +1,9 @@
-import { Location } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormGroup} from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ToastrService } from 'ngx-toastr';
 import { AuthService } from '../../services/auth.service';
+import { ToastrNoticeService } from '../../services/toastr-notice.service';
 import { AuthFormType } from '../../shared/auth-form/auth-form.component';
 
 
@@ -23,22 +22,10 @@ export class AuthComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private toastrService: ToastrService,
+    private toastrNotice: ToastrNoticeService,
     private route: ActivatedRoute,
     private router: Router
-  ) {
-
-    const { errorMessage, message } = this.router.getCurrentNavigation()?.extras?.state || {}
-
-    if (message) {
-      this.toastrService.info(message)
-    }
-
-    if (errorMessage) {
-      this.toastrService.error(errorMessage)
-    }
-
-  }
+  ) {}
 
   ngOnInit(): void {
     if (this.currentPath === 'sign-up') {
@@ -52,9 +39,10 @@ export class AuthComponent implements OnInit {
 
   resendMail(){
     if (this.resendMailCount > 3 || !this.email) return
+
     this.authService.sendVerificationMail(this.email).subscribe({
       next: (res) => {
-        this.toastrService.success(res.message)
+        this.toastrNotice.addMessage({ notice: res.message })
         this.showVerifiedMailNotice = true
         this.resendMailCount += 1
       }
@@ -70,10 +58,10 @@ export class AuthComponent implements OnInit {
         return this.authService.signIn({email, password}).subscribe({
           next: (res) => {
             if (!res.user) {
-              this.toastrService.error('something went wrong please try later.')
+              this.alertErrorMessage('something went wrong please try later.')
             }
 
-            this.toastrService.success('login successfully!')
+            this.toastrNotice.addMessage({success: 'login successfully!'})
             this.router.navigate([''])
           },
           error: (err: HttpErrorResponse) => {
@@ -81,7 +69,8 @@ export class AuthComponent implements OnInit {
               this.showVerifiedMailNotice = true
               this.email = email
             }
-            if (err.error?.message) this.toastrService.error(err.error.message)
+
+            if (err.error?.message) this.alertErrorMessage(err.error.message)
           }
         });
       case 'register':
@@ -91,20 +80,24 @@ export class AuthComponent implements OnInit {
           this.email = res.email
         },
         error: (err: HttpErrorResponse) => {
-          if (err.error?.message) this.toastrService.error(err.error.message)
+          if (err.error?.message) this.alertErrorMessage(err.error.message)
         }
        });
       case 'forgotPassword':
         return this.authService.sendResetPasswordMail(email).subscribe({
           next: (res) => {
             this.formType = 'login'
-            this.toastrService.success(res.message)
+            this.toastrNotice.addMessage({success: res.message})
           },
           error: (err: HttpErrorResponse) => {
-            if (err.error?.message) this.toastrService.error(err.error.message)
+            if (err.error?.message) this.alertErrorMessage(err.error.message)
           }
         })
     }
+  }
+
+  private alertErrorMessage(error: string){
+    this.toastrNotice.addMessage({ error })
   }
 
 }

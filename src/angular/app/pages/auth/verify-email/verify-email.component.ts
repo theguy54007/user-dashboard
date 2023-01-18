@@ -2,6 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from 'src/angular/app/services/auth.service';
+import { ToastrNoticeService } from 'src/angular/app/services/toastr-notice.service';
 
 @Component({
   selector: 'app-verify-email',
@@ -13,21 +14,27 @@ export class VerifyEmailComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private toastrNotice: ToastrNoticeService
   ) { }
 
   ngOnInit(): void {
     const token = this.route.snapshot.params['token']
+
     this.authService.verifyEmail(token).subscribe({
       next: d => {
         const { user } = d
         if (user) this.authService.addNewUser(user)
-        this.router.navigate(['/'], {state: { message: 'verified and login successfully!' }})
+
+        this.toastrNotice.addMessage({success: 'verified and login successfully!' })
+        this.router.navigate(['/'])
       },
       error: (err: HttpErrorResponse) => {
-        const errorMessage = err.error?.message
-        if (errorMessage) {
-          this.authService.redirectToLogin({errorMessage})
+        const { message } = err.error || {}
+
+        if (message) {
+          this.toastrNotice.addMessage( { error: message } )
+          this.authService.redirectToLogin()
         }
       }
     })

@@ -29,7 +29,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   onLogout(){
     this.authService.signOut().subscribe({
       next: _ => {
-        this.authService.redirectToLogin({})
+        this.authService.redirectToLogin()
       }
     })
   }
