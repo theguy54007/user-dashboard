@@ -46,6 +46,7 @@
     "@nestjs/jwt": "^10.0.1",
     "@nestjs/mapped-types": "*",
     "@nestjs/platform-express": "^9.0.0",
+    "@nestjs/swagger": "^6.1.4",
     "@nestjs/typeorm": "^9.0.1",
     "@sendgrid/mail": "^7.7.0",
     "@types/cookie-session": "^2.0.44",
@@ -62,6 +63,7 @@
     "pg": "^8.8.0",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.2.0",
+    "swagger-ui-express": "^4.6.0",
     "tslib": "^2.3.0",
     "typeorm": "^0.3.11",
     "zone.js": "~0.11.4"
