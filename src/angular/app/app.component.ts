@@ -1,5 +1,4 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivationEnd, NavigationEnd, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ToastrNoticeService } from './services/toastr-notice.service';
 
@@ -19,7 +18,7 @@ export class AppComponent implements OnInit, OnDestroy {
   ngOnInit(){
     this.noticeSub = this.toastrNotice.messages.subscribe({
       next: (msg) => {
-        this.toastrNotice.showMessage(msg)
+        if (msg) this.toastrNotice.showMessage(msg)
       }
     })
   }
