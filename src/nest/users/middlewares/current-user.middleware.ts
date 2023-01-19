@@ -2,7 +2,7 @@ import { Injectable, NestMiddleware } from "@nestjs/common";
 import { NextFunction, Request, Response } from "express";
 import { User } from "../user.entity";
 import { UsersService } from "../users.service";
-import { AuthenticationService } from "../authentication/authentication.service";
+import { TokenService } from "../token/token.service";
 
 declare global {
   namespace Express {
@@ -17,15 +17,15 @@ export class CurrentUserMiddleware implements NestMiddleware {
 
   constructor(
     private usersService: UsersService,
-    private authServcie: AuthenticationService
+    private tokenService: TokenService
   ){}
 
-  async use(req: Request, res: Response, next: NextFunction) {
+  async use(req: Request, _: Response, next: NextFunction) {
     const { accessToken }  = req.cookies || {};
 
     if (accessToken) {
       try {
-        const payload = await this.authServcie.decryptToken(accessToken)
+        const payload = await this.tokenService.decryptToken(accessToken)
         const user = await this.usersService.findOneBySession(payload.sub)
         req.currentUser = user;
       } catch {

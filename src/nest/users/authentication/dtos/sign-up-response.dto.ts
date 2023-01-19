@@ -1,7 +1,7 @@
 import { Expose } from "class-transformer";
 
-export class OauthDto{
+export class SignUpResponseDto  {
 
   @Expose()
-  source: string
+  email: string
 }

@@ -1,8 +1,9 @@
 import { Expose, Transform } from "class-transformer";
 import { UserDto } from "./user.dto";
 import * as moment from 'moment';
+import { PickType } from "@nestjs/swagger";
 
-export class UserListDto extends UserDto {
+export class UserListDto extends PickType(UserDto, ['email','name']) {
 
   @Expose({name: 'created_at'})
   @Transform( ({value}) => moment(value).toLocaleString())

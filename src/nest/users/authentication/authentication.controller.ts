@@ -1,9 +1,8 @@
-import { Body, Controller, Get, Headers, Post, Res, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { Body, Controller, Headers, Post, Res, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { Response } from 'express';
 import { AuthGuard } from 'src/nest/guards/auth.guard';
 import { Serialize } from 'src/nest/interceptors/serialize.interceptor';
 import { CurrentUser } from '../decorator/current-user.decorator';
-import { UserDto } from '../dtos/user.dto';
 import { User } from '../user.entity';
 import { AuthenticationService } from './authentication.service';
 import { ResetForgotPasswordDto } from './dtos/reset-forgot-password.dto';
@@ -11,9 +10,16 @@ import { ResetPasswordDto } from './dtos/reset-password.dto';
 import { SignInDto } from './dtos/sign-in.dto';
 import { SignInResponseDto } from './dtos/sign-in-response.dto';
 import { SignUpDto } from './dtos/sign-up.dto';
-import { accessTokenCookieOptions } from './auth.constant';
+import { accessTokenCookieOptions } from './constants/auth.constant';
+import { ApiBadRequestResponse, ApiConflictResponse, ApiForbiddenResponse, ApiHeader, ApiOperation, ApiResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { SignUpResponseDto } from './dtos/sign-up-response.dto';
+import { MessageResponseDto } from 'src/nest/dtos/message-response.dto';
+import { LOGOUT_DONE, RESET_PASSWORD, SENT_RESET_PASSWORD_MAIL, SENT_VERIFICATION_MAIL } from './constants/response-message.constant';
+import { BAD_REQUEST, EMAIL_DUPLICATED, EMAIL_NOT_VERIFIED, EMAIL_TOKEN_INVALID, LOGIN_REQUIRE, MISSING_TOKEN, PASSWORD_INVALID, USER_NOT_EXIST } from 'src/nest/shared/error-messages.constant';
+
 
 @Controller('auth')
+@ApiTags('Authentication')
 export class AuthenticationController {
 
   constructor(
@@ -21,75 +27,180 @@ export class AuthenticationController {
   ){}
 
   @Post('sign-up')
+  @ApiResponse({
+    status: 201,
+    type: SignUpResponseDto
+  })
+  @ApiOperation({
+    description: 'Create a new user with email not verified and send verification email.'
+  })
+  @ApiBadRequestResponse({
+    description: BAD_REQUEST
+  })
+  @ApiConflictResponse({
+    description: EMAIL_DUPLICATED
+  })
+  @Serialize(SignUpResponseDto)
   signUp(@Body() body: SignUpDto) {
     return this.authService.signUp(body);
   }
 
   @Post('sign-in')
+  @ApiOperation({
+    description: 'Sign In User'
+  })
+  @ApiResponse({
+    status: 201,
+    type: SignInResponseDto
+  })
+  @ApiUnauthorizedResponse({
+    description: [
+      PASSWORD_INVALID,
+      USER_NOT_EXIST
+    ].join(' / ')
+  })
+  @ApiForbiddenResponse({
+    description: EMAIL_NOT_VERIFIED
+  })
+  @ApiBadRequestResponse({
+    description: BAD_REQUEST
+  })
   @Serialize(SignInResponseDto)
-  async signIn(@Body() body: SignInDto, @Res({passthrough: true}) response: Response ){
+  async signIn(
+    @Body() body: SignInDto,
+    @Res({passthrough: true}) response: Response
+  ){
     const result = await this.authService.signIn(body)
     response.cookie('accessToken', result.accessToken, accessTokenCookieOptions)
 
     return result
   }
 
-  @Get('current-user')
-  @UseGuards(AuthGuard)
-  @Serialize(UserDto)
-  getCurrentUser(@CurrentUser() user: User){
-    return user
-  }
-
   @Post('/sign-out')
+  @ApiOperation({
+    description: 'Sign out user , then invalidate access token and session \n * Required to be logged in via `auth/sign-in` API'
+  })
+  @ApiResponse({
+    status: 201,
+    type: MessageResponseDto,
+    description: LOGOUT_DONE
+  })
+  @ApiForbiddenResponse({
+    description: LOGIN_REQUIRE
+  })
   @UseGuards(AuthGuard)
-  async signOut(@Res({passthrough: true}) response: Response, @CurrentUser() user: User){
+  async signOut(
+    @Res({passthrough: true})
+    response: Response,
+    @CurrentUser() user: User
+  ){
     await this.authService.signOut(user.id)
     response.clearCookie('accessToken')
 
     return {
-      message: 'logout done'
+      message: LOGOUT_DONE
     }
   }
 
-  @Post('/send-email-verification')
-  async sendEmailVerify(@Body('email') email: string){
-    await this.authService.sendVerificationEmail(email)
-    return { message: 'Please check the email and click the confirmation link in the email within 5 minutes.'}
-  }
 
   @Post('/verify-email')
+  @ApiOperation({
+    description: 'verify the email and sign-in user'
+  })
+  @ApiHeader({
+    required: true,
+    name: 'verify-token',
+    description: 'verify token get from the link inside the email sent by `/send-email-verification API` '
+  })
+  @ApiResponse({
+    status: 201,
+    type: SignInResponseDto
+  })
+  @ApiUnauthorizedResponse({
+    description: [
+      USER_NOT_EXIST,
+      MISSING_TOKEN,
+      EMAIL_TOKEN_INVALID
+    ].join(' / ')
+  })
   @Serialize(SignInResponseDto)
-  async verifyEmail(@Body('verifyToken') token: string, @Res({passthrough: true}) response: Response){
+  async verifyEmail(
+    @Headers('verify-token') token: string,
+    @Res({passthrough: true}) response: Response
+  ){
+    if (!token) throw new UnauthorizedException(MISSING_TOKEN)
+
     const result = await this.authService.verifyEmail(token)
     response.cookie('accessToken', result.accessToken, accessTokenCookieOptions)
 
     return result
   }
 
-  @Post('/send-reset-password-mail')
-  async sendResetPasswordMail(@Body('email') email: string){
-    await this.authService.sendResetPasswordEmail(email)
-    return { message: 'Please check the email and click the reset link in the email within 5 minutes.' }
-  }
+
 
   @Post('/reset-forgot-password')
-  async resetForgotPassword(@Body() body: ResetForgotPasswordDto, @Headers('reset-token') token: string) {
-    if (!token) throw new UnauthorizedException('missing reset token')
+  @ApiOperation({
+    description: 'reset password when user forgot the original password.'
+  })
+  @ApiHeader({
+    required: true,
+    name: 'reset-token',
+    description: 'reset token get from the link inside the email sent by `/send-reset-password-mail API` '
+  })
+  @ApiResponse({
+    status: 201,
+    type: MessageResponseDto,
+    description: RESET_PASSWORD
+  })
+  @ApiBadRequestResponse({
+    description: BAD_REQUEST
+  })
+  @ApiUnauthorizedResponse({
+    description: [
+      MISSING_TOKEN,
+      USER_NOT_EXIST,
+      EMAIL_TOKEN_INVALID
+    ].join(' / ')
+  })
+  async resetForgotPassword(
+    @Body() body: ResetForgotPasswordDto,
+    @Headers('reset-token') token: string
+  ) {
+    if (!token) throw new UnauthorizedException(MISSING_TOKEN)
 
     await this.authService.resetForgotPassword(token, body)
     return {
-      message: 'Reset done! Please login again with new password.'
+      message: RESET_PASSWORD
     }
   }
 
   @Post('/reset-password')
+  @ApiOperation({
+    description: 'reset password when user is logged in \n * Required to be logged in via `auth/sign-in` API'
+  })
+  @ApiResponse({
+    status: 201,
+    type: MessageResponseDto,
+    description: RESET_PASSWORD
+  })
+  @ApiUnauthorizedResponse({
+    description: [
+      PASSWORD_INVALID
+    ].join(' / ')
+  })
+  @ApiForbiddenResponse({
+    description: LOGIN_REQUIRE
+  })
   @UseGuards(AuthGuard)
-  async resetPassword(@Body() body: ResetPasswordDto, @CurrentUser() user: User, @Res({passthrough: true}) response: Response) {
+  async resetPassword(
+    @Body() body: ResetPasswordDto,
+    @CurrentUser() user: User,
+    @Res({passthrough: true}) response: Response
+  ) {
     await this.authService.resetPassword(user, body)
     response.clearCookie('accessToken')
     return {
-      message: 'Reset done! Please login again with new password.'
+      message: RESET_PASSWORD
     }
   }
 }

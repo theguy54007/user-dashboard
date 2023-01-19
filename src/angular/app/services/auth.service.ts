@@ -19,7 +19,7 @@ interface SignIn extends Pick<SignUp, 'email'|'password'> {}
 interface ResetForgotPassword extends Pick<SignUp, 'password'|'passwordConfirmation'> {}
 
 interface ResetPassword extends ResetForgotPassword {
-  oldPassword: string
+  originalPassword: string
 }
 
 @Injectable({
@@ -65,16 +65,10 @@ export class AuthService {
     )
   }
 
-  sendVerificationMail(email: string){
-    return this.apiService.post('auth/send-email-verification', { email })
-  }
-
   verifyEmail(verifyToken: string){
-    return this.apiService.post('auth/verify-email', { verifyToken })
-  }
-
-  sendResetPasswordMail(email: string){
-    return this.apiService.post('auth/send-reset-password-mail', { email })
+    const options = {headers: new HttpHeaders()};
+    options.headers = options.headers.set('verify-token', verifyToken)
+    return this.apiService.post('auth/verify-email', options)
   }
 
   resetForgotPassword(body: ResetForgotPassword, token: string){

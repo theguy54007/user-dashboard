@@ -39,7 +39,7 @@ export class ResetPasswordComponent implements OnInit {
   }
 
   onSubmit(form: FormGroup){
-    const { oldPassword, password, passwordConfirmation } = form.value
+    const { originalPassword, password, passwordConfirmation } = form.value
     form.reset();
 
     switch(this.formType){
@@ -61,7 +61,7 @@ export class ResetPasswordComponent implements OnInit {
           }
         })
       case 'resetPassword':
-        return this.authService.resetPassword({oldPassword, password, passwordConfirmation}).subscribe({
+        return this.authService.resetPassword({originalPassword, password, passwordConfirmation}).subscribe({
           next: (res) => {
             this.authService.logout()
             const { message } = res

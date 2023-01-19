@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as moment from 'moment';
 import { FindOneOptions, FindOptionsWhere, MoreThan, Repository } from 'typeorm';
 import { Session } from '../sessions/session.entity';
+import { EMAIL_DUPLICATED, USER_NOT_EXIST } from '../shared/error-messages.constant';
 import { User } from './user.entity';
 
 interface UserQueryInterface {
@@ -23,7 +24,7 @@ export class UsersService {
     } catch (err) {
       const pgUniqueViolationErrorCode = '23505';
       if (err.code === pgUniqueViolationErrorCode) {
-        throw new ConflictException('email is already been used, please try another email');
+        throw new ConflictException(EMAIL_DUPLICATED);
       }
       throw err;
     }
@@ -64,7 +65,7 @@ export class UsersService {
 
   async update(id: number, attrs: Partial<User>){
     const user = await this.findWithOauth({ id })
-    if (!user) throw new NotFoundException('user not found');
+    if (!user) throw new NotFoundException(USER_NOT_EXIST);
 
     Object.assign(user, attrs);
     return this.repo.save(user);

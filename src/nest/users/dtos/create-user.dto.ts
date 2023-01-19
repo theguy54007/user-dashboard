@@ -1,4 +1,4 @@
-import { IsEmail, MinLength, Matches, MaxLength } from 'class-validator';
+import { IsEmail, MinLength, Matches, MaxLength, IsString } from 'class-validator';
 export class CreateUserDto{
   @IsEmail()
   email: string;
@@ -6,6 +6,7 @@ export class CreateUserDto{
   @MaxLength(30, { message: 'The max length of name is 30'})
   name: string;
 
+  @IsString()
   @MinLength(8, { message: " The min length of password is 8 " })
   @Matches(/^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/,
       { message: " A password at least contains one numeric digit, one special char(eg: !@#$%^&*), one lowercase char and one uppercase char" }

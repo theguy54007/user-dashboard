@@ -1,4 +1,4 @@
-import { PickType } from '@nestjs/mapped-types';
+import { PickType } from '@nestjs/swagger';
 import { SignUpDto } from './sign-up.dto';
 import { IsString } from 'class-validator';
 

@@ -22,18 +22,16 @@ export class SessionsService {
 
   async create(sessionAttr: CreateSessionDto){
     // invalidating old session
-    const { user_id } = sessionAttr
+    const { user_id: id } = sessionAttr
     const oldSession = await this.findOneActiveBy({
-      user: {
-        id: user_id
-      }
+      user: { id }
     })
     if (oldSession) {
       this.updateEndAt(oldSession.id)
     }
 
     const session = this.repo.create({
-      user: {id: user_id},
+      user: { id },
       auth_token: randomUUID(),
       end_at: this.newDateTime({ms: +this.configService.get('JWT_ACCESS_TOKEN_TTL')})
     })

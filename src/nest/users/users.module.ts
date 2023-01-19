@@ -18,6 +18,9 @@ import { OauthService } from './authentication/oauth/oauth.service';
 import { OauthController } from './authentication/oauth/oauth.controller';
 import { Oauth } from './authentication/oauth/oauth.entity';
 import { FacebookAuthModule } from 'facebook-auth-nestjs';
+import { AuthMailController } from './auth-mail/auth-mail.controller';
+import { AuthMailService } from './auth-mail/auth-mail.service';
+import { TokenService } from './token/token.service';
 
 @Module({
   imports: [
@@ -43,7 +46,8 @@ import { FacebookAuthModule } from 'facebook-auth-nestjs';
   controllers: [
     UsersController,
     AuthenticationController,
-    OauthController
+    OauthController,
+    AuthMailController
   ],
   providers: [
     {
@@ -53,7 +57,9 @@ import { FacebookAuthModule } from 'facebook-auth-nestjs';
     UsersService,
     AuthenticationService,
     SessionsService,
-    OauthService
+    OauthService,
+    AuthMailService,
+    TokenService
   ]
 })
 export class UsersModule {

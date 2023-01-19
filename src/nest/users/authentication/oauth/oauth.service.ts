@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FacebookAuthService } from 'facebook-auth-nestjs';
 import { OAuth2Client } from 'google-auth-library';
+import { EMAIL_DUPLICATED, INVALID_FB_TOKEN, INVALID_GOOGLE_TOKEN } from 'src/nest/shared/error-messages.constant';
 import { Repository } from 'typeorm';
 import { User } from '../../user.entity';
 import { AuthenticationService } from '../authentication.service';
@@ -47,12 +48,8 @@ export class OauthService {
         name,
         source: 'google'
       })
-    } catch (err) {
-      const pgUniqueViolationErrorCode = '23505';
-      if (err.code === pgUniqueViolationErrorCode) {
-        throw new ConflictException();
-      }
-      throw new UnauthorizedException();
+    } catch {
+      throw new UnauthorizedException(INVALID_GOOGLE_TOKEN);
     }
   }
 
@@ -67,7 +64,7 @@ export class OauthService {
         source: 'fb'
       })
     } catch {
-      throw new UnauthorizedException('invalid accessToken')
+      throw new UnauthorizedException(INVALID_FB_TOKEN)
     }
   }
 

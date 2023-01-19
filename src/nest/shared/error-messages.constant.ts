@@ -1,0 +1,10 @@
+export const EMAIL_TOKEN_INVALID = 'token is invalid or expired, please resend the email and try again.'
+export const USER_NOT_EXIST = 'User does not exists'
+export const PASSWORD_INVALID = 'Password invalid'
+export const EMAIL_NOT_VERIFIED = "Email is not verified"
+export const BAD_REQUEST = "Please send the request with valid body"
+export const LOGIN_REQUIRE = "Please sign in before you proceed"
+export const EMAIL_DUPLICATED = "Email is already been used, please try another email"
+export const MISSING_TOKEN = 'Missing reset token'
+export const INVALID_FB_TOKEN = 'Invalid access token'
+export const INVALID_GOOGLE_TOKEN = 'Invalid id token'

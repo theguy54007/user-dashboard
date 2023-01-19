@@ -2,6 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormGroup} from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { AuthMailService } from '../../services/auth-mail.service';
 import { AuthService } from '../../services/auth.service';
 import { ToastrNoticeService } from '../../services/toastr-notice.service';
 import { AuthFormType } from '../../shared/auth-form/auth-form.component';
@@ -22,6 +23,7 @@ export class AuthComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
+    private authMailService: AuthMailService,
     private toastrNotice: ToastrNoticeService,
     private route: ActivatedRoute,
     private router: Router
@@ -44,7 +46,7 @@ export class AuthComponent implements OnInit {
   resendMail(){
     if (this.resendMailCount > 3 || !this.email) return
 
-    this.authService.sendVerificationMail(this.email).subscribe({
+    this.authMailService.sendVerificationMail(this.email).subscribe({
       next: (res) => {
         this.toastrNotice.addMessage({ notice: res.message })
         this.showVerifiedMailNotice = true
@@ -59,43 +61,11 @@ export class AuthComponent implements OnInit {
 
     switch (this.formType) {
       case 'login':
-        return this.authService.signIn({email, password}).subscribe({
-          next: (res) => {
-            if (!res.user) {
-              this.alertErrorMessage('something went wrong please try later.')
-            }
-
-            this.handleAfterSignIn()
-          },
-          error: (err: HttpErrorResponse) => {
-            if (err.status === 403) {
-              this.showVerifiedMailNotice = true
-              this.email = email
-            }
-
-            if (err.error?.message) this.alertErrorMessage(err.error.message)
-          }
-        });
+        return this.loginSubmit(email, password)
       case 'register':
-       return this.authService.signUp({email, password, passwordConfirmation}).subscribe({
-        next: (res) => {
-          this.showVerifiedMailNotice = true;
-          this.email = res.email
-        },
-        error: (err: HttpErrorResponse) => {
-          if (err.error?.message) this.alertErrorMessage(err.error.message)
-        }
-       });
+       return this.registerSubmit(email, password, passwordConfirmation)
       case 'forgotPassword':
-        return this.authService.sendResetPasswordMail(email).subscribe({
-          next: (res) => {
-            this.formType = 'login'
-            this.toastrNotice.addMessage({success: res.message})
-          },
-          error: (err: HttpErrorResponse) => {
-            if (err.error?.message) this.alertErrorMessage(err.error.message)
-          }
-        })
+        return this.forgotPasswordSubmit(email);
     }
   }
 
@@ -106,6 +76,50 @@ export class AuthComponent implements OnInit {
   private handleAfterSignIn(){
     this.toastrNotice.addMessage({ success: 'login successfully!' })
     this.router.navigate([''])
+  }
+
+  private loginSubmit(email: string, password: string){
+    return this.authService.signIn({ email, password }).subscribe({
+      next: (res) => {
+        if (!res.user) {
+          this.alertErrorMessage('something went wrong please try later.')
+        }
+
+        this.handleAfterSignIn()
+      },
+      error: (err: HttpErrorResponse) => {
+        if (err.status === 403) {
+          this.showVerifiedMailNotice = true
+          this.email = email
+        }
+
+        if (err.error?.message) this.alertErrorMessage(err.error.message)
+      }
+    });
+  }
+
+  private registerSubmit(email: string, password: string, passwordConfirmation: string){
+    return this.authService.signUp({email, password, passwordConfirmation}).subscribe({
+      next: (res) => {
+        this.showVerifiedMailNotice = true;
+        this.email = res.email
+      },
+      error: (err: HttpErrorResponse) => {
+        if (err.error?.message) this.alertErrorMessage(err.error.message)
+      }
+      });
+  }
+
+  private forgotPasswordSubmit(email: string){
+    return this.authMailService.sendResetPasswordMail(email).subscribe({
+      next: (res) => {
+        this.formType = 'login'
+        this.toastrNotice.addMessage({success: res.message})
+      },
+      error: (err: HttpErrorResponse) => {
+        if (err.error?.message) this.alertErrorMessage(err.error.message)
+      }
+    })
   }
 
 }

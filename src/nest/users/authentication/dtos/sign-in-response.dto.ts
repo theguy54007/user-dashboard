@@ -1,7 +1,7 @@
 import { Expose, Type } from "class-transformer";
 import { UserDto } from "../../dtos/user.dto";
 
-export class SignInResponseDto extends UserDto  {
+export class SignInResponseDto  {
 
   @Expose()
   @Type(() => UserDto)

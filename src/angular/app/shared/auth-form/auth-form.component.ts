@@ -108,7 +108,7 @@ export class AuthFormComponent implements OnInit, OnChanges {
             this.form.addControl('email', this.formControlMapping.email)
             break;
           case 'resetPassword':
-            this.form.addControl('oldPassword', this.formControlMapping.login.password)
+            this.form.addControl('originalPassword', this.formControlMapping.login.password)
             break
         }
       case 'resetForgotPassword':
