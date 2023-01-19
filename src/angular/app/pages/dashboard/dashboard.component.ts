@@ -4,6 +4,14 @@ import { User } from '../../model/user/user.model';
 import { ToastrNoticeService } from '../../services/toastr-notice.service';
 import { UserService } from '../../services/user.service';
 
+
+interface UsersStatistic {
+  total: number;
+  activeToday: number;
+  average7day: number
+}
+
+
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
@@ -37,10 +45,4 @@ export class DashboardComponent implements OnInit {
     })
   }
 
-}
-
-interface UsersStatistic {
-  total: number;
-  activeToday: number;
-  average7day: number
 }

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
 import { FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 
 
@@ -11,7 +11,7 @@ export type AuthFormType = typeof AuthFormTypes[number]
   templateUrl: './auth-form.component.html',
   styleUrls: ['./auth-form.component.scss']
 })
-export class AuthFormComponent implements OnInit {
+export class AuthFormComponent implements OnInit, OnChanges {
   @Input() formType: AuthFormType
   @Input() hiddenSubmit: boolean = false
   @Output() emitForm = new EventEmitter<FormGroup>();
@@ -65,6 +65,7 @@ export class AuthFormComponent implements OnInit {
   ngOnChanges(){
     this.initForm()
   }
+
   onSubmit(){
     if (!this.form.valid) {
       return

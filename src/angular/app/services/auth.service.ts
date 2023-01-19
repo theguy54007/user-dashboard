@@ -1,10 +1,26 @@
+import { FacebookLoginProvider, SocialAuthService } from '@abacritt/angularx-social-login';
 import { HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { BehaviorSubject, catchError, of, tap } from 'rxjs';
+import { BehaviorSubject, catchError, finalize, map, of, tap } from 'rxjs';
 import { User } from '../model/user/user.model';
 import { ApiService } from './api.service';
 import { UserService } from './user.service';
+
+interface SignUp {
+  email: string;
+  password: string;
+  passwordConfirmation: string;
+}
+
+interface SignIn extends Pick<SignUp, 'email'|'password'> {}
+
+
+interface ResetForgotPassword extends Pick<SignUp, 'password'|'passwordConfirmation'> {}
+
+interface ResetPassword extends ResetForgotPassword {
+  oldPassword: string
+}
 
 @Injectable({
   providedIn: 'root'
@@ -15,17 +31,25 @@ export class AuthService {
   constructor(
     private apiService: ApiService,
     private userService: UserService,
-    private router: Router
+    private router: Router,
+    private socialService: SocialAuthService
   ) { }
 
   signIn(body: SignIn){
     return this.apiService.post('auth/sign-in', body).pipe(
-      tap(data => {
-        const { user } = data
-        if (user) {
-          this.addNewUser(user)
-        }
-      })
+      tap(data => this.handleAfterSignIn(data))
+    )
+  }
+
+  googleLogin(idToken: string){
+    return this.apiService.post('oauth/google', { idToken }).pipe(
+      tap(data => this.handleAfterSignIn(data))
+    )
+  }
+
+  facebookLogin(accessToken: string){
+    return this.apiService.post('oauth/facebook', { accessToken }).pipe(
+      tap(data => this.handleAfterSignIn(data))
     )
   }
 
@@ -65,13 +89,16 @@ export class AuthService {
 
   autoSignIn(){
     return this.userService.getCurrentUser().pipe(
-      tap((user: User) => {
+      map((user: User) => {
         this.addNewUser(user)
+        return user
       }),
       catchError(_ => {
         this.addNewUser(null)
-        return of({})
-      })
+        const user = this.user.getValue()
+        return of(user)
+      }),
+      finalize(()=>{ return this.user.getValue()})
     )
   }
 
@@ -84,22 +111,26 @@ export class AuthService {
   }
 
   logout(){
+    const user = this.user.getValue()
+
+    if (user.isOauth) {
+      this.socialService.signOut()
+    }
     this.user.next(null)
   }
-}
 
+  signInWithFB(){
+    this.socialService.signIn(FacebookLoginProvider.PROVIDER_ID)
+  }
 
-interface SignUp {
-  email: string;
-  password: string;
-  passwordConfirmation: string;
-}
+  subscribeAuthState(){
+    return this.socialService.authState
+  }
 
-interface SignIn extends Pick<SignUp, 'email'|'password'> {}
-
-
-interface ResetForgotPassword extends Pick<SignUp, 'password'|'passwordConfirmation'> {}
-
-interface ResetPassword extends ResetForgotPassword {
-  oldPassword: string
+  private handleAfterSignIn(data){
+    const { user } = data
+    if (user) {
+      this.addNewUser(user)
+    }
+  }
 }

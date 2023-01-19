@@ -7,4 +7,8 @@ export class User extends UserAbstract {
     super()
     Object.assign(this, data)
   }
+
+  get isOauth() {
+    return this.oauths.length > 0
+  }
 }

@@ -1,4 +1,5 @@
-import { Expose } from "class-transformer";
+import { Expose, Type } from "class-transformer";
+import { OauthDto } from "../authentication/oauth/dtos/oauth.dto";
 
 export class UserDto{
 
@@ -8,4 +9,7 @@ export class UserDto{
   @Expose()
   name: string;
 
+  @Expose()
+  @Type(() => OauthDto)
+  oauths: OauthDto[]
 }

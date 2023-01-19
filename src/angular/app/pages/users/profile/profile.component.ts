@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { User } from 'src/angular/app/model/user/user.model';
 import { AuthService } from 'src/angular/app/services/auth.service';
+import { ToastrNoticeService } from 'src/angular/app/services/toastr-notice.service';
 import { UserService } from 'src/angular/app/services/user.service';
 
 @Component({
@@ -21,7 +22,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
   constructor(
     private authService: AuthService,
     private userService: UserService,
-    private router: Router
+    private router: Router,
+    private toastrNotice: ToastrNoticeService
   ) { }
 
   ngOnInit(): void {
@@ -52,7 +54,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
       next: user => {
         this.isButtonLoading = false
         this.authService.addNewUser(user)
-        this.router.navigate([''], {state: {success: 'Updated successfully!'}})
+        this.toastrNotice.addMessage({ success: 'Updated successfully!' })
+        this.router.navigate([''])
       }
     })
   }

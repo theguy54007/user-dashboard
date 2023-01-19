@@ -12,19 +12,24 @@
             <button *ngIf="formType !== 'login'" class="btn btn-primary" (click)="onSwitchMode('login')" type="button">Switch to Sign In </button>
             <button *ngIf="formType === 'login'"class="btn btn-primary" (click)="onSwitchMode('forgotPassword')" type="button">forgot password?</button>
           </div>
-          <div *ngIf="['login', 'register'].includes(formType)">
+          <app-oauth (signInDone)="onOauthSignIn($event)" *ngIf="['login', 'register'].includes(formType)"></app-oauth>
+
+          <!-- <div *ngIf="['login', 'register'].includes(formType)">
             <hr class="my-4">
-            <div class="d-grid mb-2">
-              <button class="btn btn-google btn-login text-uppercase fw-bold" type="submit">
-                <i class="fab fa-google me-2"></i> Sign in with Google
-              </button>
+            <div  class="d-grid mb-2">
+              <asl-google-signin-button
+                type='standard'
+                shape="rectangular"
+                width="355"
+                size='large'>
+              </asl-google-signin-button>
             </div>
             <div class="d-grid">
-              <button class="btn btn-facebook btn-login text-uppercase fw-bold" type="submit">
+              <button class="btn btn-facebook btn-login text-uppercase fw-bold" (click)="signInWithFB()" type="submit">
                 <i class="fab fa-facebook-f me-2"></i> Sign in with Facebook
               </button>
             </div>
-          </div>
+          </div> -->
 
         </div>
 

@@ -14,17 +14,36 @@ import { CurrentUserMiddleware } from './middlewares/current-user.middleware';
 import { SendgridModule } from 'src/nest/sendgrid/sendgrid.module';
 import { Session } from '../sessions/session.entity';
 import { SessionsService } from '../sessions/sessions.service';
+import { OauthService } from './authentication/oauth/oauth.service';
+import { OauthController } from './authentication/oauth/oauth.controller';
+import { Oauth } from './authentication/oauth/oauth.entity';
+import { FacebookAuthModule } from 'facebook-auth-nestjs';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, Session]),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: process.env.NODE_ENV ? `.env.${process.env.NODE_ENV}` : '.env'
+    }),
+    TypeOrmModule.forFeature(
+      [
+        User,
+        Session,
+        Oauth
+      ]
+    ),
     JwtModule.registerAsync(jwtConfig.asProvider()),
     ConfigModule.forFeature(jwtConfig),
+    FacebookAuthModule.forRoot({
+      clientId: +process.env.FB_CLIENT_ID,
+      clientSecret: process.env.FB_CLIENT_SECRET,
+    }),
     SendgridModule
   ],
   controllers: [
     UsersController,
-    AuthenticationController
+    AuthenticationController,
+    OauthController
   ],
   providers: [
     {
@@ -33,7 +52,8 @@ import { SessionsService } from '../sessions/sessions.service';
     },
     UsersService,
     AuthenticationService,
-    SessionsService
+    SessionsService,
+    OauthService
   ]
 })
 export class UsersModule {

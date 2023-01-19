@@ -31,11 +31,6 @@ export class UsersController {
     return this.usersService.statistic()
   }
 
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.usersService.findOne(+id);
-  // }
-
   @Get('/current-user')
   @Serialize(UserDto)
   getCurrentUser(@CurrentUser() user){
@@ -48,8 +43,4 @@ export class UsersController {
     return this.usersService.update(user.id, updateUserDto);
   }
 
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.usersService.remove(+id);
-  // }
 }

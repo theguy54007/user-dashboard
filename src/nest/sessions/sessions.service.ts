@@ -7,6 +7,11 @@ import { MoreThan, Repository } from 'typeorm';
 import { CreateSessionDto } from './dtos/create-session.dto';
 import { Session } from './session.entity';
 
+interface SessionQuery {
+  user?: {id: number};
+  auth_token?: string;
+}
+
 @Injectable()
 export class SessionsService {
 
@@ -41,7 +46,7 @@ export class SessionsService {
   }
 
   async update(id: number, sessionAttr: Partial<Session>) {
-     const session = await this.findOne(id)
+     const session = await this.findOneBy(id)
     if (!session) throw new NotFoundException('session not found')
 
     Object.assign(session, sessionAttr);
@@ -52,7 +57,7 @@ export class SessionsService {
     return this.update(id, {end_at: this.newDateTime()})
   }
 
-  findOne(id: number) {
+  findOneBy(id: number) {
     return this.repo.findOneBy({id: id})
   }
 
@@ -76,10 +81,4 @@ export class SessionsService {
 
     return momentDate.toDate()
   }
-}
-
-
-interface SessionQuery {
-  user?: {id: number};
-  auth_token?: string;
 }

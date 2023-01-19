@@ -6,7 +6,6 @@ import { SignUpDto } from './dtos/sign-up.dto';
 import { JwtService } from '@nestjs/jwt';
 import jwtConfig from '../../../../config/jwt.config';
 import { ConfigService, ConfigType } from '@nestjs/config';
-import { ActiveUserData } from './interfaces/active-user-data.interface';
 import { User } from '../user.entity';
 import { SendgridService } from 'src/nest/sendgrid/sendgrid.service';
 import { ResetPasswordDto } from './dtos/reset-password.dto';
@@ -67,19 +66,6 @@ export class AuthenticationService {
     this.sessionService.updateEndAt(session.id)
   }
 
-  // async generateTokens(sub: number, expiresIn?: number) {
-  //   const [accessToken] = await Promise.all([
-  //     this.signToken<Partial<ActiveUserData>>(
-  //       sub,
-  //       expiresIn || this.jwtConfiguration.accessTokenTtl,
-  //     )
-  //   ]);
-
-  //   return {
-  //     accessToken
-  //   };
-  // }
-
   async decryptToken(token: string){
     const payload = await this.jwtService.verifyAsync(
       token,
@@ -114,12 +100,9 @@ export class AuthenticationService {
   async verifyEmail(token: string){
     try {
       const payload = await this.decryptToken(token)
-      let user = await this.userService.findOne(+payload.sub);
+      let user = await this.userService.findOneBy({ id: +payload.sub });
 
-      const updatedAttr = {
-        email_verified: true
-      }
-      return await this.signInUser(user, updatedAttr)
+      return await this.signInUser(user, { email_verified: true })
     } catch {
       throw new UnauthorizedException('token is invalid or expired, please login and resend verification email again.');
     }
@@ -135,34 +118,37 @@ export class AuthenticationService {
     if (!isEqual) throw new UnauthorizedException('the old Password is invalid')
 
     const password  = await this.hashingService.hash(resetPasswordDto.password);
-    this.userService.update(user.id, { password })
+    await this.userService.update(user.id, { password })
     await this.signOut(user.id)
   }
 
   async resetForgotPassword(token: string, resetPasswordDto: ResetForgotPasswordDto){
     try {
       const payload = await this.decryptToken(token)
-      const user = await this.userService.findOne(+payload.sub);
+      const user = await this.userService.findOneBy({ id: +payload.sub });
+
       if (!user) {
         throw new UnauthorizedException('User does not exists');
       }
+
       const password  = await this.hashingService.hash(resetPasswordDto.password);
-      this.userService.update(user.id, { password })
+      await this.userService.update(user.id, { password })
     } catch {
       throw new UnauthorizedException('token is invalid or expired, please resend the email to try again.');
     }
   }
 
-  private async signInUser(user: User, updatedAttr?: Partial<User>){
+  async signInUser(user: User, updatedAttr?: Partial<User>){
     updatedAttr =  updatedAttr ?? {}
-
+    const id = user.id
     const attr = {
       ...updatedAttr,
       sign_in_count: user.sign_in_count + 1
     }
-    user = await this.userService.update(user.id, attr)
+    await this.userService.update(id, attr)
+    user = await this.userService.findWithOauth({ id })
 
-    const session = await this.sessionService.create({ user_id: user.id });
+    const session = await this.sessionService.create({ user_id: id });
     const  accessToken  = await this.signToken(session.auth_token)
     return {
       user,

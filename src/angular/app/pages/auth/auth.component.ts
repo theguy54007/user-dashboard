@@ -37,6 +37,10 @@ export class AuthComponent implements OnInit {
     this.formType = type
   }
 
+  onOauthSignIn(done: boolean){
+    if (done) this.handleAfterSignIn()
+  }
+
   resendMail(){
     if (this.resendMailCount > 3 || !this.email) return
 
@@ -61,8 +65,7 @@ export class AuthComponent implements OnInit {
               this.alertErrorMessage('something went wrong please try later.')
             }
 
-            this.toastrNotice.addMessage({success: 'login successfully!'})
-            this.router.navigate([''])
+            this.handleAfterSignIn()
           },
           error: (err: HttpErrorResponse) => {
             if (err.status === 403) {
@@ -98,6 +101,11 @@ export class AuthComponent implements OnInit {
 
   private alertErrorMessage(error: string){
     this.toastrNotice.addMessage({ error })
+  }
+
+  private handleAfterSignIn(){
+    this.toastrNotice.addMessage({ success: 'login successfully!' })
+    this.router.navigate([''])
   }
 
 }

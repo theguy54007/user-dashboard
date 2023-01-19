@@ -1,5 +1,6 @@
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Session } from "../sessions/session.entity";
+import { Oauth } from "./authentication/oauth/oauth.entity";
 
 @Entity('users')
 export class User {
@@ -10,12 +11,10 @@ export class User {
   @Column({unique: true})
   email: string;
 
-  @Column({
-    nullable: true
-  })
+  @Column({nullable: true})
   name: string;
 
-  @Column()
+  @Column({nullable: true})
   password: string;
 
   @Column({default: false})
@@ -32,4 +31,8 @@ export class User {
 
   @OneToMany(() => Session, (session) => session.user)
   sessions: Session[];
+
+  @OneToMany(() => Oauth, (oauth) => oauth.user)
+  oauths: Oauth[];
+
 }

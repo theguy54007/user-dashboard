@@ -1,10 +1,14 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as moment from 'moment';
-import { MoreThan, Repository } from 'typeorm';
+import { FindOneOptions, FindOptionsWhere, MoreThan, Repository } from 'typeorm';
 import { Session } from '../sessions/session.entity';
 import { User } from './user.entity';
 
+interface UserQueryInterface {
+  id: number,
+  email: string
+}
 @Injectable()
 export class UsersService {
 
@@ -25,7 +29,18 @@ export class UsersService {
     }
   }
 
-  findOneBy(query: UserQuery){
+  findOne(query: FindOneOptions) {
+    return this.repo.findOne(query)
+  }
+
+  findWithOauth(where: Partial<UserQueryInterface> ){
+    return this.repo.findOne({
+      where,
+      relations: {oauths: true}
+    })
+  }
+
+  findOneBy(query: FindOptionsWhere<User>){
     return this.repo.findOneBy(query);
   }
 
@@ -34,13 +49,9 @@ export class UsersService {
                     .getMany()
   }
 
-  findOne(id: number) {
-    return this.repo.findOneBy({id: id})
-  }
-
   async findOneBySession(auth_token: string){
     const user = await this.repo.findOne({
-      relations: ['sessions'],
+      relations: {oauths: true},
       where: {
         sessions: {
           auth_token,
@@ -52,15 +63,11 @@ export class UsersService {
   }
 
   async update(id: number, attrs: Partial<User>){
-    const user = await this.findOne(id)
+    const user = await this.findWithOauth({ id })
     if (!user) throw new NotFoundException('user not found');
 
     Object.assign(user, attrs);
     return this.repo.save(user);
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} user`;
   }
 
   async findAllWIthLastSessionAt(){
@@ -82,14 +89,15 @@ export class UsersService {
   }
 
   async statistic(){
-    // Total number of users who have signed up.
-    const total = await this.repo.count()
 
-    // Total number of users with active sessions today.
-    const activeToday = await this.getActiveUsersToday()
-
-    // Average number of active session users in the last 7 days rolling.
-    const average7day = await this.getAvgActiveUsersLast7Days()
+    const  [ total, activeToday, average7day ] = await Promise.all([
+      // Total number of users who have signed up.
+      this.repo.count(),
+      // Total number of users with active sessions today.
+      this.getActiveUsersToday(),
+      // Average number of active session users in the last 7 days rolling.
+      this.getAvgActiveUsersLast7Days()
+    ])
 
     return {
       total,
@@ -137,9 +145,4 @@ export class UsersService {
     const avgActiveUsers = activeUsers.reduce((sum, row) => sum + +row.activeUsers, 0)/7
     return avgActiveUsers;
   }
-}
-
-
-interface UserQuery {
-  email?: string;
 }
