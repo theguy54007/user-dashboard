@@ -1,5 +1,5 @@
 import { HttpClientModule } from '@angular/common/http';
-import { APP_INITIALIZER, NgModule } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { CookieService } from 'ngx-cookie-service';
@@ -14,10 +14,11 @@ import { ResetPasswordComponent } from './pages/auth/reset-password/reset-passwo
 import { VerifyEmailComponent } from './pages/auth/verify-email/verify-email.component';
 import { ProfileComponent } from './pages/users/profile/profile.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
-import { fetchCurrentUserFactory } from './services/current-user.service';
-import { AuthService } from './services/auth.service';
 import { HeaderComponent } from './shared/header/header.component';
 import { LoadingComponent } from './shared/loading/loading.component';
+import { FacebookLoginProvider, GoogleLoginProvider, SocialAuthServiceConfig, SocialLoginModule } from '@abacritt/angularx-social-login';
+import { environment } from '../environments/environment';
+import { OauthComponent } from './pages/auth/oauth/oauth.component';
 
 @NgModule({
   declarations: [
@@ -29,7 +30,8 @@ import { LoadingComponent } from './shared/loading/loading.component';
     ProfileComponent,
     DashboardComponent,
     HeaderComponent,
-    LoadingComponent
+    LoadingComponent,
+    OauthComponent
   ],
   imports: [
     BrowserModule,
@@ -37,15 +39,33 @@ import { LoadingComponent } from './shared/loading/loading.component';
     ReactiveFormsModule,
     HttpClientModule,
     ToastrModule.forRoot(),
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    SocialLoginModule
   ],
   providers: [
     CookieService,
     {
-      provide: APP_INITIALIZER,
-      useFactory: fetchCurrentUserFactory,
-      deps: [AuthService],
-      multi: true
+      provide: 'SocialAuthServiceConfig',
+      useValue: {
+        autologin: false,
+        providers: [
+          {
+            id: GoogleLoginProvider.PROVIDER_ID,
+            provider: new GoogleLoginProvider(
+              environment.googleClientId
+            )
+          },
+          {
+            id: FacebookLoginProvider.PROVIDER_ID,
+            provider: new FacebookLoginProvider(
+              environment.fbClientId
+            )
+          },
+        ],
+        onError: (err) => {
+          console.error(err);
+        }
+      } as SocialAuthServiceConfig
     }
   ],
   bootstrap: [AppComponent]
