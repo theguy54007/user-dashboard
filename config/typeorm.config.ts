@@ -10,11 +10,11 @@ const configService = new ConfigService();
 
 export default new DataSource({
   type: 'postgres',
-  host: configService.get<string>('DB_HOST'),
-  port: +configService.get<string>('DB_PORT'),
-  username: configService.get<string>('DB_USERNAME'),
-  password: configService.get<string>('DB_PASSWORD'),
-  database: configService.get<string>('DB_NAME'),
+  host: configService.get<string>('PGHOST'),
+  port: +configService.get<string>('PGPORT'),
+  username: configService.get<string>('PGUSER'),
+  password: configService.get<string>('PGPASSWORD'),
+  database: configService.get<string>('PGDATABASE'),
   entities: ['./src/nest/**/*.entity.ts'],
   migrations: ['./migrations/*.ts'],
 });

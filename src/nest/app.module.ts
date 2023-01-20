@@ -23,18 +23,18 @@ const cookieSession = require('cookie-session')
       useFactory: (config: ConfigService) => {
         return {
           type: 'postgres',
-          database: config.get<string>('DB_NAME'),
-          username: config.get<string>('DB_USERNAME'),
-          password: config.get<string>('DB_PASSWORD'),
-          host: config.get<string>('DB_HOST'),
-          port: config.get<number>('DB_PORT'),
+          database: config.get<string>('PGDATABASE'),
+          username: config.get<string>('PGUSER'),
+          password: config.get<string>('PGPASSWORD'),
+          host: config.get<string>('PGHOST'),
+          port: config.get<number>('PGPORT'),
           synchronize: false,
           autoLoadEntities: true
         }
       }
     }),
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..','..','user-dashboard'),
+      rootPath: join(__dirname, '..','..','..','frontend'),
     }),
 
     UsersModule,
