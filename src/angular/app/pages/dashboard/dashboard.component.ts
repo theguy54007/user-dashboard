@@ -33,8 +33,8 @@ export class DashboardComponent implements OnInit {
         this.users = res
       },
       error: (err: HttpErrorResponse) =>{
-        const { message } = err.error?.message || {}
-        if ( message ) this.toastrNotice.addMessage( { error: message } )
+        const { message: error } = err.error?.message || {}
+        if ( error ) this.toastrNotice.addMessage( { error } )
       }
     })
 
