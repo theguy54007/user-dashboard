@@ -6,9 +6,11 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.setGlobalPrefix('api')
+
   app.enableCors({
     credentials: true,
-    origin: 'http://localhost:4200'
+    origin: process.env.HOST
   });
   app.useGlobalPipes(new ValidationPipe());
   app.use(cookieParser())
@@ -19,7 +21,7 @@ async function bootstrap() {
                                        .build();
 
   const document = SwaggerModule.createDocument(app, options)
-  SwaggerModule.setup('api', app, document)
+  SwaggerModule.setup('apidoc', app, document)
 
   await app.listen(3000);
 }

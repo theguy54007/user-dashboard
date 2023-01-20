@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
+import { MiddlewareConsumer, Module, RequestMethod, ValidationPipe } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_PIPE } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -7,6 +7,8 @@ import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { SendgridModule } from './sendgrid/sendgrid.module';
 import { SessionsModule } from './sessions/sessions.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 const cookieSession = require('cookie-session')
 
@@ -29,6 +31,10 @@ const cookieSession = require('cookie-session')
         }
       }
     }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..','..','user-dashboard'),
+    }),
+
     UsersModule,
     SendgridModule,
     SessionsModule,
@@ -55,7 +61,10 @@ export class AppModule {
     consumer.apply(
       cookieSession({
         keys: [this.configService.get('COOKIE_KEY')]
-      })
-    ).forRoutes('*')
+      }),
+    ).forRoutes({
+      path: "/**",
+      method: RequestMethod.ALL
+    })
   }
 }

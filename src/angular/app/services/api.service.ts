@@ -21,7 +21,7 @@ export class ApiService {
   ) { }
 
   apiUrl(path: string){
-    return `${environment.restfulHost}/${path}`;
+    return `${environment.restfulHost}/api/${path}`;
   }
 
   get: RequestMethod = (path, body?, options?) => {
