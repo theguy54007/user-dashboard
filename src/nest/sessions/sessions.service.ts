@@ -1,5 +1,4 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { randomUUID } from 'crypto';
 import * as moment from 'moment';
@@ -16,8 +15,7 @@ interface SessionQuery {
 export class SessionsService {
 
   constructor(
-    @InjectRepository(Session) private repo: Repository<Session>,
-    private configService: ConfigService
+    @InjectRepository(Session) private repo: Repository<Session>
   ){}
 
   async create(sessionAttr: CreateSessionDto){
@@ -33,7 +31,7 @@ export class SessionsService {
     const session = this.repo.create({
       user: { id },
       auth_token: randomUUID(),
-      end_at: this.newDateTime({ms: +this.configService.get('JWT_ACCESS_TOKEN_TTL')})
+      end_at: this.newDateTime({ms: +process.env.JWT_ACCESS_TOKEN_TTL})
     })
     return this.repo.save(session)
   }

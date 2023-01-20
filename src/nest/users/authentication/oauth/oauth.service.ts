@@ -1,9 +1,8 @@
-import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FacebookAuthService } from 'facebook-auth-nestjs';
 import { OAuth2Client } from 'google-auth-library';
-import { EMAIL_DUPLICATED, INVALID_FB_TOKEN, INVALID_GOOGLE_TOKEN } from 'src/nest/shared/error-messages.constant';
+import { INVALID_FB_TOKEN, INVALID_GOOGLE_TOKEN } from 'src/nest/shared/error-messages.constant';
 import { Repository } from 'typeorm';
 import { User } from '../../user.entity';
 import { AuthenticationService } from '../authentication.service';
@@ -22,7 +21,6 @@ export class OauthService {
   private oauthClient: OAuth2Client;
 
   constructor(
-    private configService: ConfigService,
     private authService: AuthenticationService,
     private facebookService: FacebookAuthService,
     @InjectRepository(Oauth) private repo: Repository<Oauth>,
@@ -30,8 +28,8 @@ export class OauthService {
   ){}
 
    onModuleInit() {
-    const clientId = this.configService.get('GOOGLE_CLIENT_ID');
-    const clientSecret = this.configService.get('GOOGLE_CLIENT_SECRET');
+    const clientId = process.env.GOOGLE_CLIENT_ID;
+    const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
     this.oauthClient = new OAuth2Client(clientId, clientSecret);
   }
 

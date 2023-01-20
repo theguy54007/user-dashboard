@@ -49,14 +49,14 @@ export class AuthMailService {
 
   private sendMail(templateKey: TemplateKey, link: string, email: string){
     const msg = {
-      from: this.configService.get('SENDGRID_FROM'),
+      from: process.env.SENDGRID_FROM,
       subject: 'Reset Your password',
-      templateId: this.configService.get(templateKey),
+      templateId: process.env[templateKey],
       personalizations: [
         {
           to: email,
           dynamicTemplateData: {
-            link:  this.configService.get("HOST") + link
+            link:  process.env.HOST + link
           },
         }
       ]
