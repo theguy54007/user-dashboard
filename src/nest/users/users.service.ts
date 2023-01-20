@@ -123,7 +123,7 @@ export class UsersService {
     const activeUsers = await this.sessionRepo
       .createQueryBuilder('session')
       .select('COUNT(DISTINCT session.user_id)', 'count')
-      .where('session.end_at > :today', {today})
+      .where('session.end_at > :endOfToday', {endOfToday})
       .andWhere('session.created_at BETWEEN :startOfToday AND :endOfToday', { startOfToday, endOfToday })
       .getRawOne();
 
