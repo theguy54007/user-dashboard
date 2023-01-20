@@ -179,11 +179,11 @@ npm run typeorm:run-migrations
 
 ### Dashboard
 
-  1. The dashboard displays a list of all users' registration time, login count, and last session time.
-  2. At the top of the dashboard, 3 data points will be displayed:
-    -  Total number of registered members (including unverified members)
-    -  Number of active sessions today (time is based on UTC)
-    -  Average number of active sessions in the past 7 days. The calculation is done by taking the number of active sessions per day in the past 7 days, adding them up, and dividing by 7 to get the final average.
+- The dashboard displays a list of all users' registration time, login count, and last session time.
+- At the top of the dashboard, 3 data points will be displayed:
+  - Total number of registered members (including unverified members).
+  - Number of active sessions today (time is based on UTC).
+  - Average number of active sessions in the past 7 days. The calculation is done by taking the number of active sessions per day in the past 7 days, adding them up, and dividing by 7 to get the final average.
 
 ## Third Party Service
 
