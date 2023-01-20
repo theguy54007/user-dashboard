@@ -2,15 +2,16 @@ import { Body, Controller, Post, Res } from '@nestjs/common';
 import { Response } from 'express';
 import { OauthService } from './oauth.service';
 import { accessTokenCookieOptions } from '../constants/auth.constant';
-import { ApiConflictResponse, ApiOperation, ApiResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
-import { SignInResponseDto } from '../dtos/sign-in-response.dto';
+import { ApiOperation, ApiResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { Serialize } from 'src/nest/interceptors/serialize.interceptor';
 import { GoogleLoginDto } from './dtos/google-login.dto';
 import { FacebookLoginDto } from './dtos/facebook-login.dto';
-import { EMAIL_DUPLICATED, INVALID_FB_TOKEN, INVALID_GOOGLE_TOKEN } from 'src/nest/shared/error-messages.constant';
+import { INVALID_FB_TOKEN, INVALID_GOOGLE_TOKEN } from 'src/nest/shared/error-messages.constant';
+import { UserDto } from '../../dtos/user.dto';
 
 @Controller('oauth')
 @ApiTags('Google Login & Facebook Login')
+@Serialize(UserDto)
 export class OauthController {
 
   constructor(
@@ -23,20 +24,19 @@ export class OauthController {
   })
   @ApiResponse({
     status: 201,
-    type: SignInResponseDto
+    type: UserDto
   })
   @ApiUnauthorizedResponse({
     description: INVALID_GOOGLE_TOKEN
   })
-  @Serialize(SignInResponseDto)
   async googleAuth(
     @Body() body: GoogleLoginDto,
     @Res({ passthrough: true }) response: Response
   ){
-    const result = await this.oauthService.googleAuth(body.idToken)
-    response.cookie('accessToken', result.accessToken, accessTokenCookieOptions)
+    const { user, accessToken } = await this.oauthService.googleAuth(body.idToken)
+    response.cookie('accessToken', accessToken, accessTokenCookieOptions)
 
-    return result
+    return user
   }
 
   @Post('facebook')
@@ -45,20 +45,18 @@ export class OauthController {
   })
   @ApiResponse({
     status: 201,
-    type: SignInResponseDto
+    type: UserDto
   })
   @ApiUnauthorizedResponse({
     description: INVALID_FB_TOKEN
   })
-  @Serialize(SignInResponseDto)
   async facebookAuth(
     @Body() body: FacebookLoginDto,
-    @Res({passthrough: true}) response: Response
+    @Res({ passthrough: true }) response: Response
   ){
-    const result = await this.oauthService.facebookAuth(body.accessToken)
-    response.cookie('accessToken', result.accessToken, accessTokenCookieOptions)
-
-    return result
+    const { user, accessToken } = await this.oauthService.facebookAuth(body.accessToken)
+    response.cookie('accessToken', accessToken, accessTokenCookieOptions)
+    return user
   }
 
 

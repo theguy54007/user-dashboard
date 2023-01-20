@@ -9,6 +9,7 @@ export class User extends UserAbstract {
   }
 
   get isOauth() {
+    // if (!this.oauths) return false
     return this.oauths.length > 0
   }
 }

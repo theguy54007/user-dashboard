@@ -10,14 +10,13 @@
     <li class="nav-item">
       <a routerLink="/profile" routerLinkActive="active" class="nav-link">Profile</a>
     </li>
-    <li *ngIf="!user.isOauth" class="nav-item">
+    <li *ngIf="!user?.isOauth" class="nav-item">
       <a routerLink="/auth/reset-password" routerLinkActive="active" class="nav-link">Reset Password</a>
     </li>
   </ul>
 
   <div class="col-md-3 text-end">
     <button *ngIf="user" type="button" class="btn btn-outline-primary me-2" (click)="onLogout()">Logout | {{ user.email }}</button>
-    <button *ngIf="!user" type="button" class="btn btn-primary" routerLink="/auth/sign-in">Login</button>
   </div>
 
 </header>

@@ -8,14 +8,14 @@ import { AuthenticationService } from './authentication.service';
 import { ResetForgotPasswordDto } from './dtos/reset-forgot-password.dto';
 import { ResetPasswordDto } from './dtos/reset-password.dto';
 import { SignInDto } from './dtos/sign-in.dto';
-import { SignInResponseDto } from './dtos/sign-in-response.dto';
 import { SignUpDto } from './dtos/sign-up.dto';
 import { accessTokenCookieOptions } from './constants/auth.constant';
 import { ApiBadRequestResponse, ApiConflictResponse, ApiForbiddenResponse, ApiHeader, ApiOperation, ApiResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { SignUpResponseDto } from './dtos/sign-up-response.dto';
 import { MessageResponseDto } from 'src/nest/dtos/message-response.dto';
-import { LOGOUT_DONE, RESET_PASSWORD, SENT_RESET_PASSWORD_MAIL, SENT_VERIFICATION_MAIL } from './constants/response-message.constant';
+import { LOGOUT_DONE, RESET_PASSWORD } from './constants/response-message.constant';
 import { BAD_REQUEST, EMAIL_DUPLICATED, EMAIL_NOT_VERIFIED, EMAIL_TOKEN_INVALID, LOGIN_REQUIRE, MISSING_TOKEN, PASSWORD_INVALID, USER_NOT_EXIST } from 'src/nest/shared/error-messages.constant';
+import { UserDto } from '../dtos/user.dto';
 
 
 @Controller('auth')
@@ -51,7 +51,7 @@ export class AuthenticationController {
   })
   @ApiResponse({
     status: 201,
-    type: SignInResponseDto
+    type: UserDto
   })
   @ApiUnauthorizedResponse({
     description: [
@@ -65,15 +65,15 @@ export class AuthenticationController {
   @ApiBadRequestResponse({
     description: BAD_REQUEST
   })
-  @Serialize(SignInResponseDto)
+  @Serialize(UserDto)
   async signIn(
     @Body() body: SignInDto,
     @Res({passthrough: true}) response: Response
   ){
-    const result = await this.authService.signIn(body)
-    response.cookie('accessToken', result.accessToken, accessTokenCookieOptions)
+    const {user, accessToken} = await this.authService.signIn(body)
+    response.cookie('accessToken', accessToken, accessTokenCookieOptions)
 
-    return result
+    return user
   }
 
   @Post('/sign-out')
@@ -114,7 +114,7 @@ export class AuthenticationController {
   })
   @ApiResponse({
     status: 201,
-    type: SignInResponseDto
+    type: UserDto
   })
   @ApiUnauthorizedResponse({
     description: [
@@ -123,17 +123,17 @@ export class AuthenticationController {
       EMAIL_TOKEN_INVALID
     ].join(' / ')
   })
-  @Serialize(SignInResponseDto)
+  @Serialize(UserDto)
   async verifyEmail(
     @Headers('verify-token') token: string,
     @Res({passthrough: true}) response: Response
   ){
     if (!token) throw new UnauthorizedException(MISSING_TOKEN)
 
-    const result = await this.authService.verifyEmail(token)
-    response.cookie('accessToken', result.accessToken, accessTokenCookieOptions)
+    const { user, accessToken } = await this.authService.verifyEmail(token)
+    response.cookie('accessToken', accessToken, accessTokenCookieOptions)
 
-    return result
+    return user
   }
 
 

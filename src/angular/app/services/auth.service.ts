@@ -107,7 +107,7 @@ export class AuthService {
   logout(){
     const user = this.user.getValue()
 
-    if (user.isOauth) {
+    if (user?.isOauth) {
       this.socialService.signOut()
     }
     this.user.next(null)
@@ -121,8 +121,7 @@ export class AuthService {
     return this.socialService.authState
   }
 
-  private handleAfterSignIn(data){
-    const { user } = data
+  private handleAfterSignIn(user){
     if (user) {
       this.addNewUser(user)
     }

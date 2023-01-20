@@ -15,9 +15,9 @@ import { AuthFormType } from '../../shared/auth-form/auth-form.component';
 })
 export class AuthComponent implements OnInit {
   formType: AuthFormType = 'login'
-  showVerifiedMailNotice: boolean = false;
-  hiddenSubmit: boolean = false;
-  resendMailCount: number = 0;
+  showVerifiedMailNotice = false;
+  hiddenSubmit = false;
+  resendMailCount = 0;
   email: string
   currentPath = this.route.snapshot.url[0].path
 
@@ -86,11 +86,7 @@ export class AuthComponent implements OnInit {
 
   private loginSubmit(email: string, password: string){
     return this.authService.signIn({ email, password }).subscribe({
-      next: (res) => {
-        if (!res.user) {
-          this.alertErrorMessage('something went wrong please try later.')
-        }
-
+      next: (_) => {
         this.handleAfterSignIn()
       },
       error: (err: HttpErrorResponse) => {
@@ -113,7 +109,7 @@ export class AuthComponent implements OnInit {
       error: (err: HttpErrorResponse) => {
         if (err.error?.message) this.alertErrorMessage(err.error.message)
       }
-      });
+    });
   }
 
   private forgotPasswordSubmit(email: string){
