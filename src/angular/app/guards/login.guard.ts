@@ -21,11 +21,13 @@ export class LoginGuard implements CanActivate {
       take(1),
       switchMap(user => {
         if (user) {
+          this.toastrNotice.addMessage({notice: 'You already login.'})
           return of(this.router.createUrlTree(['/']));
         }
         return this.authService.autoSignIn().pipe(
           map((signedInUser: User) => {
             if (signedInUser && signedInUser.email) {
+              this.toastrNotice.addMessage({notice: 'You already login.'})
               return this.router.createUrlTree(['/']);;
             }
             return true;

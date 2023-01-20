@@ -21,6 +21,12 @@ export class AuthComponent implements OnInit {
   email: string
   currentPath = this.route.snapshot.url[0].path
 
+  titleMapping = {
+    login: 'Sign In',
+    register: 'Sign Up',
+    forgotPassword: 'Forgot Password'
+  }
+
   constructor(
     private authService: AuthService,
     private authMailService: AuthMailService,
