@@ -14,7 +14,7 @@ import { ApiBadRequestResponse, ApiConflictResponse, ApiForbiddenResponse, ApiHe
 import { SignUpResponseDto } from './dtos/sign-up-response.dto';
 import { MessageResponseDto } from 'src/nest/dtos/message-response.dto';
 import { LOGOUT_DONE, RESET_PASSWORD } from './constants/response-message.constant';
-import { BAD_REQUEST, EMAIL_DUPLICATED, EMAIL_NOT_VERIFIED, EMAIL_TOKEN_INVALID, LOGIN_REQUIRE, MISSING_TOKEN, PASSWORD_INVALID, USER_NOT_EXIST } from 'src/nest/shared/error-messages.constant';
+import { BAD_REQUEST, EMAIL_DUPLICATED, EMAIL_NOT_VERIFIED, EMAIL_PASSWORD_INCORRECT, EMAIL_TOKEN_INVALID, LOGIN_REQUIRE, MISSING_TOKEN, PASSWORD_INVALID, USER_NOT_EXIST } from 'src/nest/shared/error-messages.constant';
 import { UserDto } from '../dtos/user.dto';
 import { VerifyEmailDto } from './dtos/verify-email.dto';
 
@@ -55,10 +55,7 @@ export class AuthenticationController {
     type: UserDto
   })
   @ApiUnauthorizedResponse({
-    description: [
-      PASSWORD_INVALID,
-      USER_NOT_EXIST
-    ].join(' / ')
+    description: EMAIL_PASSWORD_INCORRECT
   })
   @ApiForbiddenResponse({
     description: EMAIL_NOT_VERIFIED
