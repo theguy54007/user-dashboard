@@ -18,11 +18,12 @@ export class UsersController {
 
   @Get('/with-last-session-at')
   @ApiOperation({
-    description: "Fetch user list \n * Required to be logged in via `auth/sign-in` API"
+    description: "<b>Required to be logged in via `auth/sign-in` API</b> \n \n Fetch user list, each user will have \n 1. Timestamp of user sign up. \n 2. Number of times logged in. \n 3. Timestamp of the last user session \n"
   })
   @ApiResponse({
     status: 200,
-    type: UserListDto
+    type: UserListDto,
+    isArray: true
   })
   @ApiForbiddenResponse({
     description: LOGIN_REQUIRE
@@ -34,7 +35,7 @@ export class UsersController {
 
   @Get('/statistic')
   @ApiOperation({
-    description: "Fetch user statistic data \n * Required to be logged in via `auth/sign-in` API"
+    description: "<b>Required to be logged in via `auth/sign-in` API</b> \n \n Fetch user statistic data:  \n 1. Total number of users who have signed up. \n 2. Total number of users with active sessions today. \n 3. Average number of active session users in the last 7 days rolling."
   })
   @ApiResponse({
     status: 200,
@@ -66,7 +67,7 @@ export class UsersController {
 
   @Patch('/user')
   @ApiOperation({
-    description: "update user data \n * Required to be logged in via `auth/sign-in` API"
+    description: "update user's name \n * Required to be logged in via `auth/sign-in` API"
   })
   @ApiResponse({
     status: 200,

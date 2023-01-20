@@ -41,7 +41,7 @@ export class OauthController {
 
   @Post('facebook')
   @ApiOperation({
-    description: "Login with google, create a user data when it is first time login."
+    description: "Login with facebook, create a user data when it is first time login."
   })
   @ApiResponse({
     status: 201,
