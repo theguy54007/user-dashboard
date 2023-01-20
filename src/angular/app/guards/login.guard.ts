@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
+import { CanActivate, Router, UrlTree } from '@angular/router';
 import { Observable, take, switchMap, of, map } from 'rxjs';
 import { User } from '../model/user/user.model';
 import { AuthService } from '../services/auth.service';
@@ -19,8 +19,8 @@ export class LoginGuard implements CanActivate {
   canActivate():Observable<boolean | UrlTree> | UrlTree{
     return this.authService.user.pipe(
       take(1),
-      switchMap(user => {
-        if (user) {
+      switchMap((user: User) => {
+        if (user && user.email) {
           this.toastrNotice.addMessage({notice: 'You already login.'})
           return of(this.router.createUrlTree(['/']));
         }

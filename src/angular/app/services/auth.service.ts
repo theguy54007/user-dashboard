@@ -84,10 +84,9 @@ export class AuthService {
         this.addNewUser(user)
         return user
       }),
-      catchError(_ => {
+      catchError(e => {
         this.addNewUser(null)
-        const user = this.user.getValue()
-        return of(user)
+        return of(null)
       }),
       finalize(()=>{ return this.user.getValue()})
     )
