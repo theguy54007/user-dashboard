@@ -1,0 +1,38 @@
+import { Injectable } from '@angular/core';
+import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
+import { Observable, take, switchMap, of, map } from 'rxjs';
+import { User } from '../model/user/user.model';
+import { AuthService } from '../services/auth.service';
+import { ToastrNoticeService } from '../services/toastr-notice.service';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class LoginGuard implements CanActivate {
+
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private toastrNotice: ToastrNoticeService
+  ){}
+
+  canActivate():Observable<boolean | UrlTree> | UrlTree{
+    return this.authService.user.pipe(
+      take(1),
+      switchMap(user => {
+        if (user) {
+          return of(this.router.createUrlTree(['/']));
+        }
+        return this.authService.autoSignIn().pipe(
+          map((signedInUser: User) => {
+            if (signedInUser && signedInUser.email) {
+              return this.router.createUrlTree(['/']);;
+            }
+            return true;
+          })
+        );
+      })
+    );
+  }
+
+}

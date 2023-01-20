@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from './guards/auth.guard';
+import { LoginGuard } from './guards/login.guard';
 import { AuthComponent } from './pages/auth/auth.component';
 import { ResetPasswordComponent } from './pages/auth/reset-password/reset-password.component';
 import { VerifyEmailComponent } from './pages/auth/verify-email/verify-email.component';
@@ -24,11 +25,13 @@ const routes: Routes = [
     children: [
       {
         path: 'sign-in',
-        component: AuthComponent
+        component: AuthComponent,
+        canActivate: [LoginGuard]
       },
       {
-        path: 'sign-out',
-        component: AuthComponent
+        path: 'sign-up',
+        component: AuthComponent,
+        canActivate: [LoginGuard]
       },
       {
         path: 'verify-email/:token',
@@ -43,7 +46,6 @@ const routes: Routes = [
         component: ResetPasswordComponent
       },
     ]
-
   }
 
 ];
