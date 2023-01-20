@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from 'src/angular/app/services/auth.service';
 import { ToastrNoticeService } from 'src/angular/app/services/toastr-notice.service';
 import { AuthFormType } from 'src/angular/app/shared/auth-form/auth-form.component';
@@ -19,14 +19,18 @@ export class ResetPasswordComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private route: ActivatedRoute,
+    private router: Router,
     private toastrNotice: ToastrNoticeService
   ) { }
 
   ngOnInit(): void {
-
     switch (this.currentPath) {
       case 'reset-password':
         this.formType = 'resetPassword'
+        const user = this.authService.user.getValue()
+        if (user && user.isOauth) {
+          this.router.navigate([''])
+        }
         break;
       case 'reset-forgot-password':
         this.formType = 'resetForgotPassword'
