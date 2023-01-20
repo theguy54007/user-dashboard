@@ -1,5 +1,4 @@
 import { FacebookLoginProvider, SocialAuthService } from '@abacritt/angularx-social-login';
-import { HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject, catchError, finalize, map, of, tap } from 'rxjs';
@@ -16,9 +15,11 @@ interface SignUp {
 interface SignIn extends Pick<SignUp, 'email'|'password'> {}
 
 
-interface ResetForgotPassword extends Pick<SignUp, 'password'|'passwordConfirmation'> {}
+interface ResetForgotPassword extends Pick<SignUp, 'password'|'passwordConfirmation'> {
+  resetToken: string
+}
 
-interface ResetPassword extends ResetForgotPassword {
+interface ResetPassword extends Pick<SignUp, 'password'|'passwordConfirmation'> {
   originalPassword: string
 }
 
@@ -66,15 +67,11 @@ export class AuthService {
   }
 
   verifyEmail(verifyToken: string){
-    const options = {headers: new HttpHeaders()};
-    options.headers = options.headers.set('verify-token', verifyToken)
-    return this.apiService.post('auth/verify-email', options)
+    return this.apiService.post('auth/verify-email', { verifyToken })
   }
 
-  resetForgotPassword(body: ResetForgotPassword, token: string){
-    const options = {headers: new HttpHeaders()};
-    options.headers = options.headers.set('reset-token', token)
-    return this.apiService.post('auth/reset-forgot-password', body, options)
+  resetForgotPassword(body: ResetForgotPassword){
+    return this.apiService.post('auth/reset-forgot-password', body)
   }
 
   resetPassword(body: ResetPassword){

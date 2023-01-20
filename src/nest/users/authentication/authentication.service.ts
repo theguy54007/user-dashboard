@@ -88,9 +88,10 @@ export class AuthenticationService {
     await this.signOut(user.id)
   }
 
-  async resetForgotPassword(token: string, resetPasswordDto: ResetForgotPasswordDto){
+  async resetForgotPassword(resetPasswordDto: ResetForgotPasswordDto){
     try {
-      const payload = await this.tokenService.decryptToken(token)
+      const { resetToken } = resetPasswordDto
+      const payload = await this.tokenService.decryptToken(resetToken)
       const user = await this.userService.findOneBy({ id: +payload.sub });
 
       if (!user) {

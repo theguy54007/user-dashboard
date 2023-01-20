@@ -44,7 +44,11 @@ export class ResetPasswordComponent implements OnInit {
 
     switch(this.formType){
       case 'resetForgotPassword':
-        return this.authService.resetForgotPassword({ password, passwordConfirmation }, this.resetToken).subscribe({
+        return this.authService.resetForgotPassword({
+          password,
+          passwordConfirmation,
+          resetToken: this.resetToken
+        }).subscribe({
           next: (res) => {
             const { message } = res
             this.toastrNotice.addMessage({ notice: message })

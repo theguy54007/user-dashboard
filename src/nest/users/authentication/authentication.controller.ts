@@ -1,4 +1,4 @@
-import { Body, Controller, Headers, Post, Res, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, Res, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { Response } from 'express';
 import { AuthGuard } from 'src/nest/guards/auth.guard';
 import { Serialize } from 'src/nest/interceptors/serialize.interceptor';
@@ -16,6 +16,7 @@ import { MessageResponseDto } from 'src/nest/dtos/message-response.dto';
 import { LOGOUT_DONE, RESET_PASSWORD } from './constants/response-message.constant';
 import { BAD_REQUEST, EMAIL_DUPLICATED, EMAIL_NOT_VERIFIED, EMAIL_TOKEN_INVALID, LOGIN_REQUIRE, MISSING_TOKEN, PASSWORD_INVALID, USER_NOT_EXIST } from 'src/nest/shared/error-messages.constant';
 import { UserDto } from '../dtos/user.dto';
+import { VerifyEmailDto } from './dtos/verify-email.dto';
 
 
 @Controller('auth')
@@ -107,11 +108,6 @@ export class AuthenticationController {
   @ApiOperation({
     description: 'verify the email and sign-in user'
   })
-  @ApiHeader({
-    required: true,
-    name: 'verify-token',
-    description: 'verify token get from the link inside the email sent by `/send-email-verification API` '
-  })
   @ApiResponse({
     status: 201,
     type: UserDto
@@ -125,12 +121,13 @@ export class AuthenticationController {
   })
   @Serialize(UserDto)
   async verifyEmail(
-    @Headers('verify-token') token: string,
+    @Body() body: VerifyEmailDto,
     @Res({passthrough: true}) response: Response
   ){
-    if (!token) throw new UnauthorizedException(MISSING_TOKEN)
+    const { verifyToken } = body
+    if (!verifyToken) throw new UnauthorizedException(MISSING_TOKEN)
 
-    const { user, accessToken } = await this.authService.verifyEmail(token)
+    const { user, accessToken } = await this.authService.verifyEmail(verifyToken)
     response.cookie('accessToken', accessToken, accessTokenCookieOptions)
 
     return user
@@ -141,11 +138,6 @@ export class AuthenticationController {
   @Post('/reset-forgot-password')
   @ApiOperation({
     description: 'reset password when user forgot the original password.'
-  })
-  @ApiHeader({
-    required: true,
-    name: 'reset-token',
-    description: 'reset token get from the link inside the email sent by `/send-reset-password-mail API` '
   })
   @ApiResponse({
     status: 201,
@@ -164,11 +156,9 @@ export class AuthenticationController {
   })
   async resetForgotPassword(
     @Body() body: ResetForgotPasswordDto,
-    @Headers('reset-token') token: string
   ) {
-    if (!token) throw new UnauthorizedException(MISSING_TOKEN)
 
-    await this.authService.resetForgotPassword(token, body)
+    await this.authService.resetForgotPassword(body)
     return {
       message: RESET_PASSWORD
     }

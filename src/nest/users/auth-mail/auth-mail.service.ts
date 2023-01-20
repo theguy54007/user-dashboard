@@ -1,5 +1,4 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { lastValueFrom } from 'rxjs';
 import { TemplateKey } from 'src/nest/sendgrid/sendgrid.constants';
 import { SendgridService } from 'src/nest/sendgrid/sendgrid.service';
@@ -13,7 +12,6 @@ export class AuthMailService {
 
   constructor(
     private sendgridService: SendgridService,
-    private configService: ConfigService,
     private userService: UsersService,
     private tokenService: TokenService
   ) {}
@@ -36,7 +34,7 @@ export class AuthMailService {
     }
 
     const resetToken = await this.tokenService.signToken(user.id, 300)
-    const link =  '/auth/reset-password?token=' + resetToken
+    const link =  '/auth/reset-forgot-password/' + resetToken
 
     return this.sendMail('SENDGRID_RESET_PASSWORD_MAIL_TEMPLATE', link,  email)
   }
@@ -44,7 +42,7 @@ export class AuthMailService {
   async generateTokenAndSendVerificationMail(user: User){
     const token = await this.tokenService.signToken(user.id, 300)
     const link = '/auth/verify-email/' + token
-    return this.sendMail('SENDGRID_MAIL_VERIFICATION_TEMPLATE', link,  'sage.ts920126@gmail.com')
+    return this.sendMail('SENDGRID_MAIL_VERIFICATION_TEMPLATE', link,  user.email)
   }
 
   private sendMail(templateKey: TemplateKey, link: string, email: string){
