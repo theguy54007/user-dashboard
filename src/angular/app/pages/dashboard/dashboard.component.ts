@@ -1,5 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { BehaviorSubject, Subscription } from 'rxjs';
 import { User } from '../../model/user/user.model';
 import { ToastrNoticeService } from '../../services/toastr-notice.service';
 import { UserService } from '../../services/user.service';
@@ -11,17 +12,19 @@ interface UsersStatistic {
   average7day: number
 }
 
-
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, OnDestroy {
 
   users: User[]
   statistic: UsersStatistic
   total = 0
+  pageSub: Subscription
+  pageSubject = new BehaviorSubject<number>(1)
+  currentPage = 1
 
   constructor(
     private userService: UserService,
@@ -29,7 +32,30 @@ export class DashboardComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.userService.listWithLastSessionAt().subscribe({
+
+    this.fetchList()
+    this.userService.getStatistics().subscribe({
+      next: (res: UsersStatistic) => {
+        this.statistic = res
+        console.log(res)
+      }
+    })
+
+
+    this.pageSub = this.pageSubject.subscribe({
+      next: p => {
+        this.currentPage = p
+        this.fetchList()
+      }
+    })
+  }
+
+  ngOnDestroy(): void {
+    this.pageSub.unsubscribe()
+  }
+
+  private fetchList(){
+    this.userService.listWithLastSessionAt(this.currentPage).subscribe({
       next: res => {
         const { total, users } = res
         this.users = users
@@ -40,12 +66,5 @@ export class DashboardComponent implements OnInit {
         if ( error ) this.toastrNotice.addMessage( { error } )
       }
     })
-
-    this.userService.getStatistics().subscribe({
-      next: (res: UsersStatistic) => {
-        this.statistic = res
-      }
-    })
   }
-
 }

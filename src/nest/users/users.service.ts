@@ -75,7 +75,7 @@ export class UsersService {
   async findAllWIthLastSessionAt(paginationQuery: PaginationQueryDto){
     const total = await this.repo.count()
 
-    const { page = 1, perPage = 10 } = paginationQuery
+    const { page = 1, perPage = 5 } = paginationQuery
     const offset = (page - 1) * perPage
 
     const query = this.repo
@@ -127,17 +127,11 @@ export class UsersService {
       today.getMonth(),
       today.getDate(),
     );
-    const endOfToday = new Date(
-      today.getFullYear(),
-      today.getMonth(),
-      today.getDate() + 1,
-    );
 
     const activeUsers = await this.sessionRepo
       .createQueryBuilder('session')
       .select('COUNT(DISTINCT session.user_id)', 'count')
-      .where('session.end_at > :endOfToday', { startOfToday })
-      .andWhere('session.created_at BETWEEN :startOfToday AND :endOfToday', { startOfToday, endOfToday })
+      .where('session.end_at > :startOfToday', { startOfToday })
       .getRawOne();
 
     return +activeUsers.count;

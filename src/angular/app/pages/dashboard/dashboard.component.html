@@ -1,21 +1,24 @@
 <app-header></app-header>
 <div *ngIf="statistic" class="statistic-container">
   <div class="card show">
-    <app-loading *ngIf="!statistic.total"></app-loading>
     <h5>Total number of users who have signed up.</h5>
     <p>{{ statistic.total }}</p>
   </div>
   <div class="card show">
-    <app-loading *ngIf="!statistic.activeToday"></app-loading>
     <h5>Total number of users with active sessions today.</h5>
     <p>{{ statistic.activeToday }}</p>
   </div>
   <div class="card show">
-    <app-loading *ngIf="!statistic.average7day"></app-loading>
     <h5>Average number of active session users in the last 7 days rolling.</h5>
     <p>{{ statistic.average7day }}</p>
   </div>
 </div>
+<pagination-controls
+  class="paginationWrapper"
+  (pageChange)="this.pageSubject.next($event)"
+  maxSize="9">
+</pagination-controls>
+
 <div class="card shadow container mt-4">
   <table id="datatable" class="table table-striped">
     <thead>
@@ -26,7 +29,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let user of users">
+      <tr *ngFor="let user of users| paginate: {itemsPerPage: 5, currentPage: currentPage, totalItems: total}">
         <th>{{user.createdAt}}</th>
         <th>{{user.signInCount}}</th>
         <th>{{user.lastSessionAt}}</th>

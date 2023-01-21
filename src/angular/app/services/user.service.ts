@@ -18,8 +18,8 @@ export class UserService {
     return this.apiService.get('users/current-user')
   }
 
-  listWithLastSessionAt(){
-    return this.apiService.get('users/with-last-session-at')
+  listWithLastSessionAt(page: number = 1){
+    return this.apiService.get('users/with-last-session-at', { page })
   }
 
   getStatistics(){

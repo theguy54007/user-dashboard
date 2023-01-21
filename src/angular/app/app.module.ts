@@ -19,6 +19,7 @@ import { LoadingComponent } from './shared/loading/loading.component';
 import { FacebookLoginProvider, GoogleLoginProvider, SocialAuthServiceConfig, SocialLoginModule } from '@abacritt/angularx-social-login';
 import { environment } from '../environments/environment';
 import { OauthComponent } from './pages/auth/oauth/oauth.component';
+import { NgxPaginationModule } from 'ngx-pagination';
 
 @NgModule({
   declarations: [
@@ -40,7 +41,8 @@ import { OauthComponent } from './pages/auth/oauth/oauth.component';
     HttpClientModule,
     ToastrModule.forRoot(),
     BrowserAnimationsModule,
-    SocialLoginModule
+    SocialLoginModule,
+    NgxPaginationModule
   ],
   providers: [
     CookieService,

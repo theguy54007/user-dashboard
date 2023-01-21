@@ -12,3 +12,24 @@
     }
   }
 }
+
+.paginationWrapper{
+  width: 88%;
+  display: block;
+  margin: 30px auto;
+}
+
+.paginationWrapper ::ng-deep {
+   .ngx-pagination {
+    li {
+      background-color: #fff;
+      &.current{
+        background: skyblue;
+      }
+      &.disabled{
+        background-color: unset;
+      }
+    }
+
+  }
+}

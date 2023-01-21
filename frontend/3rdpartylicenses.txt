@@ -44,6 +44,9 @@ MIT
 ngx-cookie-service
 MIT
 
+ngx-pagination
+MIT
+
 ngx-toastr
 MIT
 The MIT License (MIT)
