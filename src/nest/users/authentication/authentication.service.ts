@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { ForbiddenException, Injectable, UnauthorizedException, UnprocessableEntityException } from '@nestjs/common';
 import { UsersService } from 'src/nest/users/users.service';
 import { HashingService } from '../hashing/hashing.service';
 import { SignInDto } from './dtos/sign-in.dto';
@@ -7,7 +7,7 @@ import { User } from '../user.entity';
 import { ResetPasswordDto } from './dtos/reset-password.dto';
 import { ResetForgotPasswordDto } from './dtos/reset-forgot-password.dto';
 import { SessionsService } from 'src/nest/sessions/sessions.service';
-import { EMAIL_NOT_VERIFIED, EMAIL_PASSWORD_INCORRECT, EMAIL_TOKEN_INVALID, PASSWORD_INVALID, USER_NOT_EXIST } from 'src/nest/shared/error-messages.constant';
+import { EMAIL_NOT_VERIFIED, EMAIL_PASSWORD_INCORRECT, EMAIL_TOKEN_INVALID, PASSWORD_INVALID, SSO_LOGIN, USER_NOT_EXIST } from 'src/nest/shared/error-messages.constant';
 import { TokenService } from '../token/token.service';
 import { AuthMailService } from '../auth-mail/auth-mail.service';
 
@@ -34,10 +34,14 @@ export class AuthenticationService {
 
   async signIn(signInDto: SignInDto){
     const { email, password } = signInDto
-    let user = await this.userService.findOneBy({ email })
+    let user = await this.userService.findWithOauth({ email })
 
     if (!user) {
       throw new UnauthorizedException(EMAIL_PASSWORD_INCORRECT);
+    }
+
+    if (user.oauths.length > 0) {
+      throw new UnprocessableEntityException(SSO_LOGIN)
     }
 
     const isEqual = await this.hashingService.compare(

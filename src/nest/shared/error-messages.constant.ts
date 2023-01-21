@@ -9,3 +9,4 @@ export const MISSING_TOKEN = 'Missing reset token'
 export const INVALID_FB_TOKEN = 'Invalid access token'
 export const INVALID_GOOGLE_TOKEN = 'Invalid id token'
 export const EMAIL_PASSWORD_INCORRECT = 'Email or Password incorrect.'
+export const SSO_LOGIN = "You have register with Google or Facebook Account before."

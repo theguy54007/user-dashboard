@@ -10,11 +10,11 @@ import { ResetPasswordDto } from './dtos/reset-password.dto';
 import { SignInDto } from './dtos/sign-in.dto';
 import { SignUpDto } from './dtos/sign-up.dto';
 import { accessTokenCookieOptions } from './constants/auth.constant';
-import { ApiBadRequestResponse, ApiConflictResponse, ApiForbiddenResponse, ApiHeader, ApiOperation, ApiResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiConflictResponse, ApiForbiddenResponse, ApiHeader, ApiOperation, ApiResponse, ApiTags, ApiUnauthorizedResponse, ApiUnprocessableEntityResponse } from '@nestjs/swagger';
 import { SignUpResponseDto } from './dtos/sign-up-response.dto';
 import { MessageResponseDto } from 'src/nest/dtos/message-response.dto';
 import { LOGOUT_DONE, RESET_PASSWORD } from './constants/response-message.constant';
-import { BAD_REQUEST, EMAIL_DUPLICATED, EMAIL_NOT_VERIFIED, EMAIL_PASSWORD_INCORRECT, EMAIL_TOKEN_INVALID, LOGIN_REQUIRE, MISSING_TOKEN, PASSWORD_INVALID, USER_NOT_EXIST } from 'src/nest/shared/error-messages.constant';
+import { BAD_REQUEST, EMAIL_DUPLICATED, EMAIL_NOT_VERIFIED, EMAIL_PASSWORD_INCORRECT, EMAIL_TOKEN_INVALID, LOGIN_REQUIRE, MISSING_TOKEN, PASSWORD_INVALID, SSO_LOGIN, USER_NOT_EXIST } from 'src/nest/shared/error-messages.constant';
 import { UserDto } from '../dtos/user.dto';
 import { VerifyEmailDto } from './dtos/verify-email.dto';
 
@@ -54,14 +54,17 @@ export class AuthenticationController {
     status: 201,
     type: UserDto
   })
+  @ApiBadRequestResponse({
+    description: BAD_REQUEST
+  })
   @ApiUnauthorizedResponse({
     description: EMAIL_PASSWORD_INCORRECT
   })
   @ApiForbiddenResponse({
     description: EMAIL_NOT_VERIFIED
   })
-  @ApiBadRequestResponse({
-    description: BAD_REQUEST
+  @ApiUnprocessableEntityResponse({
+    description: SSO_LOGIN
   })
   @Serialize(UserDto)
   async signIn(
