@@ -1,8 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, UnprocessableEntityException } from '@nestjs/common';
 import { lastValueFrom } from 'rxjs';
 import { TemplateKey } from 'src/nest/sendgrid/sendgrid.constants';
 import { SendgridService } from 'src/nest/sendgrid/sendgrid.service';
-import { USER_NOT_EXIST } from 'src/nest/shared/error-messages.constant';
+import { SSO_LOGIN, USER_NOT_EXIST } from 'src/nest/shared/error-messages.constant';
 import { TokenService } from '../token/token.service';
 import { User } from '../user.entity';
 import { UsersService } from '../users.service';
@@ -28,9 +28,13 @@ export class AuthMailService {
   }
 
   async resetPasswordMail(email: string){
-    const user = await this.userService.findOneBy({email})
+    const user = await this.userService.findWithOauth({email})
     if (!user) {
       throw new UnauthorizedException(USER_NOT_EXIST);
+    }
+
+    if (user.oauths.length > 0) {
+      throw new UnprocessableEntityException(SSO_LOGIN)
     }
 
     const resetToken = await this.tokenService.signToken(user.id, 300)

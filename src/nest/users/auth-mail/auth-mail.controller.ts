@@ -1,7 +1,7 @@
 import { Body, Controller, Post } from '@nestjs/common';
-import { ApiBadRequestResponse, ApiOperation, ApiResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiOperation, ApiResponse, ApiTags, ApiUnauthorizedResponse, ApiUnprocessableEntityResponse } from '@nestjs/swagger';
 import { MessageResponseDto } from 'src/nest/dtos/message-response.dto';
-import { BAD_REQUEST, USER_NOT_EXIST } from 'src/nest/shared/error-messages.constant';
+import { BAD_REQUEST, SSO_LOGIN, USER_NOT_EXIST } from 'src/nest/shared/error-messages.constant';
 import { SENT_RESET_PASSWORD_MAIL, SENT_VERIFICATION_MAIL } from '../authentication/constants/response-message.constant';
 import { SendEmailDto } from '../authentication/dtos/send-email.dto';
 import { AuthMailService } from './auth-mail.service';
@@ -50,6 +50,9 @@ export class AuthMailController {
     description: [
       USER_NOT_EXIST
     ].join(' / ')
+  })
+  @ApiUnprocessableEntityResponse({
+    description: SSO_LOGIN
   })
   async sendResetPasswordMail(@Body() body: SendEmailDto){
     await this.authMailService.resetPasswordMail(body.email)
