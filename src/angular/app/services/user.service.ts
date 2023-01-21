@@ -7,7 +7,7 @@ import { ApiService } from './api.service';
 export class UserService {
 
   constructor(
-    private apiService: ApiService,
+    private readonly apiService: ApiService,
   ) { }
 
   updateName(name: string){

@@ -17,10 +17,10 @@ export class ResetPasswordComponent implements OnInit {
   resetToken: string
 
   constructor(
-    private authService: AuthService,
-    private route: ActivatedRoute,
-    private router: Router,
-    private toastrNotice: ToastrNoticeService
+    private readonly authService: AuthService,
+    private readonly route: ActivatedRoute,
+    private readonly router: Router,
+    private readonly toastrNotice: ToastrNoticeService
   ) { }
 
   ngOnInit(): void {

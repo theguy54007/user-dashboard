@@ -11,9 +11,9 @@ import { ToastrNoticeService } from '../services/toastr-notice.service';
 export class AuthGuard implements CanActivate {
 
   constructor(
-    private authService: AuthService,
-    private router: Router,
-    private toastrNotice: ToastrNoticeService
+    private readonly authService: AuthService,
+    private readonly router: Router,
+    private readonly toastrNotice: ToastrNoticeService
   ){}
 
   canActivate():Observable<boolean | UrlTree> {

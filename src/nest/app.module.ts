@@ -56,7 +56,7 @@ const cookieSession = require('cookie-session')
 })
 export class AppModule {
   constructor(
-    private configService: ConfigService
+    private readonly configService: ConfigService
   ){}
 
   configure(consumer: MiddlewareConsumer) {

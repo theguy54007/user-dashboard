@@ -28,11 +28,11 @@ export class AuthComponent implements OnInit {
   }
 
   constructor(
-    private authService: AuthService,
-    private authMailService: AuthMailService,
-    private toastrNotice: ToastrNoticeService,
-    private route: ActivatedRoute,
-    private router: Router
+    private readonly authService: AuthService,
+    private readonly authMailService: AuthMailService,
+    private readonly toastrNotice: ToastrNoticeService,
+    private readonly route: ActivatedRoute,
+    private readonly router: Router
   ) {}
 
   ngOnInit(): void {

@@ -8,7 +8,7 @@ import { ApiService } from './api.service';
 export class AuthMailService {
 
   constructor(
-    private apiService: ApiService,
+    private readonly apiService: ApiService,
   ) { }
 
 

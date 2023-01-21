@@ -15,11 +15,11 @@ import { AuthMailService } from '../auth-mail/auth-mail.service';
 export class AuthenticationService {
 
   constructor(
-    private userService: UsersService,
-    private hashingService: HashingService,
-    private sessionService: SessionsService,
-    private tokenService: TokenService,
-    private authMailService: AuthMailService
+    private readonly userService: UsersService,
+    private readonly hashingService: HashingService,
+    private readonly sessionService: SessionsService,
+    private readonly tokenService: TokenService,
+    private readonly authMailService: AuthMailService
   ){}
 
   async signUp(signUpDto: SignUpDto){

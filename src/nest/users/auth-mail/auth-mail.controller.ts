@@ -11,7 +11,7 @@ import { AuthMailService } from './auth-mail.service';
 export class AuthMailController {
 
   constructor(
-    private authMailService: AuthMailService
+    private readonly authMailService: AuthMailService
   ){}
 
   @Post('/verification-mail')

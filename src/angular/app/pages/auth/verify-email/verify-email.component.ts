@@ -12,10 +12,10 @@ import { ToastrNoticeService } from 'src/angular/app/services/toastr-notice.serv
 export class VerifyEmailComponent implements OnInit {
 
   constructor(
-    private authService: AuthService,
-    private route: ActivatedRoute,
-    private router: Router,
-    private toastrNotice: ToastrNoticeService
+    private readonly authService: AuthService,
+    private readonly route: ActivatedRoute,
+    private readonly router: Router,
+    private readonly toastrNotice: ToastrNoticeService
   ) { }
 
   ngOnInit(): void {

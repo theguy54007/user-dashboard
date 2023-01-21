@@ -16,7 +16,7 @@ export class ToastrNoticeService {
   messages = new BehaviorSubject<Partial<Message>>(null)
 
   constructor(
-    private toastrService: ToastrService
+    private readonly toastrService: ToastrService
   ) { }
 
   addMessage(msg: Partial<Message>){

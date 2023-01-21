@@ -21,8 +21,8 @@ export class OauthService {
   private oauthClient: OAuth2Client;
 
   constructor(
-    private authService: AuthenticationService,
-    private facebookService: FacebookAuthService,
+    private readonly authService: AuthenticationService,
+    private readonly facebookService: FacebookAuthService,
     @InjectRepository(Oauth) private repo: Repository<Oauth>,
     @InjectRepository(User) private userRepo: Repository<User>
   ){}

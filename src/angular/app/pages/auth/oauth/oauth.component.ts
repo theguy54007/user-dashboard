@@ -13,7 +13,7 @@ export class OauthComponent implements OnInit, OnDestroy {
   @Output() signInDone = new EventEmitter<boolean>(false);
 
   constructor(
-    private authService: AuthService
+    private readonly authService: AuthService
   ) { }
 
   ngOnInit(): void {

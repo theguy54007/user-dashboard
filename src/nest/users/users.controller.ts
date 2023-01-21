@@ -21,7 +21,11 @@ export class UsersController {
 
   @Get('/with-last-session-at')
   @ApiOperation({
-    description: "<b>Required to be logged in via `auth/sign-in` API</b> \n \n Fetch user list, each user will have \n 1. Timestamp of user sign up. \n 2. Number of times logged in. \n 3. Timestamp of the last user session \n"
+    description: "<b>Required to be logged in via `auth/sign-in` API</b>" +
+    "\n \n Fetch user list, each user will have" +
+    "\n 1. Timestamp of user sign up. " +
+    "\n 2. Number of times logged in. " +
+    "\n 3. Timestamp of the last user session"
   })
   @ApiResponse({
     status: 200,
@@ -38,7 +42,11 @@ export class UsersController {
 
   @Get('/statistic')
   @ApiOperation({
-    description: "<b>Required to be logged in via `auth/sign-in` API</b> \n \n Fetch user statistic data:  \n 1. Total number of users who have signed up. \n 2. Total number of users with active sessions today. \n 3. Average number of active session users in the last 7 days rolling."
+    description: "<b>Required to be logged in via `auth/sign-in` API</b>" +
+    "\n \n Fetch user statistic data:" +
+    "\n 1. Total number of users who have signed up." +
+    "\n 2. Total number of users with active sessions today. " +
+    "\n 3. Average number of active session users in the last 7 days rolling."
   })
   @ApiResponse({
     status: 200,

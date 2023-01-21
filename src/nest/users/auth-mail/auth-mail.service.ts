@@ -11,9 +11,9 @@ import { UsersService } from '../users.service';
 export class AuthMailService {
 
   constructor(
-    private sendgridService: SendgridService,
-    private userService: UsersService,
-    private tokenService: TokenService
+    private readonly sendgridService: SendgridService,
+    private readonly userService: UsersService,
+    private readonly tokenService: TokenService
   ) {}
 
 

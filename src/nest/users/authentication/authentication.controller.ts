@@ -24,7 +24,7 @@ import { VerifyEmailDto } from './dtos/verify-email.dto';
 export class AuthenticationController {
 
   constructor(
-    private authService: AuthenticationService,
+    private readonly authService: AuthenticationService,
   ){}
 
   @Post('sign-up')

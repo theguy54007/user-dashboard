@@ -20,10 +20,10 @@ export class ProfileComponent implements OnInit, OnDestroy {
   isButtonLoading = false;
 
   constructor(
-    private authService: AuthService,
-    private userService: UserService,
-    private router: Router,
-    private toastrNotice: ToastrNoticeService
+    private readonly authService: AuthService,
+    private readonly userService: UserService,
+    private readonly router: Router,
+    private readonly toastrNotice: ToastrNoticeService
   ) { }
 
   ngOnInit(): void {

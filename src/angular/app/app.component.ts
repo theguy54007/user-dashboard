@@ -12,7 +12,7 @@ export class AppComponent implements OnInit, OnDestroy {
   noticeSub: Subscription
 
   constructor(
-    private toastrNotice: ToastrNoticeService
+    private readonly toastrNotice: ToastrNoticeService
   ){}
 
   ngOnInit(){

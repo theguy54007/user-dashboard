@@ -30,10 +30,10 @@ export class AuthService {
   user = new BehaviorSubject<User>(null);
 
   constructor(
-    private apiService: ApiService,
-    private userService: UserService,
-    private router: Router,
-    private socialService: SocialAuthService
+    private readonly apiService: ApiService,
+    private readonly userService: UserService,
+    private readonly router: Router,
+    private readonly socialService: SocialAuthService
   ) { }
 
   signIn(body: SignIn){

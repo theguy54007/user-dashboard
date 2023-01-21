@@ -15,7 +15,7 @@ import { UserDto } from '../../dtos/user.dto';
 export class OauthController {
 
   constructor(
-    private oauthService: OauthService
+    private readonly oauthService: OauthService
   ){}
 
   @Post('google')

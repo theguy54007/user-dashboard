@@ -16,8 +16,8 @@ declare global {
 export class CurrentUserMiddleware implements NestMiddleware {
 
   constructor(
-    private usersService: UsersService,
-    private tokenService: TokenService
+    private readonly usersService: UsersService,
+    private readonly tokenService: TokenService
   ){}
 
   async use(req: Request, _: Response, next: NextFunction) {

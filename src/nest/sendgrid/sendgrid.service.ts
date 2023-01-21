@@ -6,7 +6,7 @@ import { Observable, from } from 'rxjs';
 @Injectable()
 export class SendgridService {
 
-    constructor(@Inject(SENDGRID_MAIL) private mailService: MailService) { }
+    constructor(@Inject(SENDGRID_MAIL) private readonly mailService: MailService) { }
 
     send(data: MailDataRequired): Observable<any>{
         return from(this.mailService.send(data, false))

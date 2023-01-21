@@ -13,7 +13,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   user: User
 
   constructor(
-    private authService: AuthService
+    private readonly authService: AuthService
   ) { }
 
   ngOnInit(): void {

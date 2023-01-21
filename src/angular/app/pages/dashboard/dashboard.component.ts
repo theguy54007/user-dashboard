@@ -27,8 +27,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   currentPage = 1
 
   constructor(
-    private userService: UserService,
-    private toastrNotice: ToastrNoticeService
+    private readonly userService: UserService,
+    private readonly toastrNotice: ToastrNoticeService
   ) {}
 
   ngOnInit(): void {
