@@ -21,6 +21,7 @@ export class DashboardComponent implements OnInit {
 
   users: User[]
   statistic: UsersStatistic
+  total = 0
 
   constructor(
     private userService: UserService,
@@ -30,7 +31,9 @@ export class DashboardComponent implements OnInit {
   ngOnInit(): void {
     this.userService.listWithLastSessionAt().subscribe({
       next: res => {
-        this.users = res
+        const { total, users } = res
+        this.users = users
+        this.total = total
       },
       error: (err: HttpErrorResponse) =>{
         const { message: error } = err.error?.message || {}

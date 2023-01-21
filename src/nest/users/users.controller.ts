@@ -1,20 +1,23 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, Request, NotFoundException, UseGuards } from '@nestjs/common';
+import { Controller, Get, Body, Patch, UseGuards, Query } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { Serialize } from 'src/nest/interceptors/serialize.interceptor';
 import { UserDto } from './dtos/user.dto';
 import { AuthGuard } from 'src/nest/guards/auth.guard';
 import { CurrentUser } from './decorator/current-user.decorator';
-import { UserListDto } from './dtos/user-list.dto';
 import { UserStatistic } from './dtos/user-statistic.dto';
 import { ApiForbiddenResponse, ApiOperation, ApiResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { LOGIN_REQUIRE, USER_NOT_EXIST } from '../shared/error-messages.constant';
+import { PaginationQueryDto } from '../dtos/pagination-query.dto';
+import { ListWithLastSessionDto } from './dtos/list-with-last-session.dto';
 
 @Controller('users')
 @UseGuards(AuthGuard)
 @ApiTags('Users')
 export class UsersController {
+
   constructor(private readonly usersService: UsersService) {}
+
 
   @Get('/with-last-session-at')
   @ApiOperation({
@@ -22,15 +25,15 @@ export class UsersController {
   })
   @ApiResponse({
     status: 200,
-    type: UserListDto,
+    type: ListWithLastSessionDto,
     isArray: true
   })
   @ApiForbiddenResponse({
     description: LOGIN_REQUIRE
   })
-  @Serialize(UserListDto)
-  withLastSessionAt() {
-    return this.usersService.findAllWIthLastSessionAt();
+  @Serialize(ListWithLastSessionDto)
+  withLastSessionAt(@Query() query: PaginationQueryDto) {
+    return this.usersService.findAllWIthLastSessionAt(query);
   }
 
   @Get('/statistic')

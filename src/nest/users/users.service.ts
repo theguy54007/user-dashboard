@@ -2,6 +2,7 @@ import { ConflictException, Injectable, NotFoundException } from '@nestjs/common
 import { InjectRepository } from '@nestjs/typeorm';
 import * as moment from 'moment';
 import { FindOneOptions, FindOptionsWhere, MoreThan, Repository } from 'typeorm';
+import { PaginationQueryDto } from '../dtos/pagination-query.dto';
 import { Session } from '../sessions/session.entity';
 import { EMAIL_DUPLICATED, USER_NOT_EXIST } from '../shared/error-messages.constant';
 import { User } from './user.entity';
@@ -71,7 +72,12 @@ export class UsersService {
     return this.repo.save(user);
   }
 
-  async findAllWIthLastSessionAt(){
+  async findAllWIthLastSessionAt(paginationQuery: PaginationQueryDto){
+    const total = await this.repo.count()
+
+    const { page = 1, perPage = 10 } = paginationQuery
+    const offset = (page - 1) * perPage
+
     const query = this.repo
       .createQueryBuilder('u')
       .select(['id','email', 'name', 'sign_in_count', 'created_at', 's.last_session_at'])
@@ -84,9 +90,16 @@ export class UsersService {
         },
         's',
         'u.id = s.user_id'
-      ).orderBy("created_at")
+      )
+      .orderBy("created_at")
+      .offset(offset)
+      .limit(perPage)
 
-    return await query.getRawMany();
+    const users = await query.getRawMany();
+    return {
+      total,
+      users
+    }
   }
 
   async statistic(){
