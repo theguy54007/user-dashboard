@@ -60,7 +60,13 @@ import { NgxPaginationModule } from 'ngx-pagination';
           {
             id: FacebookLoginProvider.PROVIDER_ID,
             provider: new FacebookLoginProvider(
-              environment.fbClientId
+              environment.fbClientId,
+              {
+                auth_type: 'reauthenticate',
+                scope: 'email,public_profile',
+                fields: 'name,email',
+                version: 'v1.0',
+              }
             )
           },
         ],
