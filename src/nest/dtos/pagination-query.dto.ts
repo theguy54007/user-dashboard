@@ -13,7 +13,7 @@ export class PaginationQueryDto {
   page: number
 
   @ApiPropertyOptional({
-    description: "Define the total number to be obtained."
+    description: "Default as 5. Define the total number to be obtained"
   })
   @IsOptional()
   @IsPositive()

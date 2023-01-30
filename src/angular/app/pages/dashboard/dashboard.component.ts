@@ -37,7 +37,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.userService.getStatistics().subscribe({
       next: (res: UsersStatistic) => {
         this.statistic = res
-        console.log(res)
       }
     })
 
