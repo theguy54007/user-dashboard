@@ -31,7 +31,6 @@ export class OauthComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.oauthLoginSub = this.authService.subscribeAuthState().subscribe({
       next: (user) => {
-        console.log(user)
         if (!user ) {
           return this.authService.signOut()
         }
