@@ -17,15 +17,9 @@ export class OauthComponent implements OnInit, OnDestroy {
     private readonly authService: AuthService
   ) { }
 
-  buttonText = {
-    login: {
-      google: "signin_with",
-      facebook: "Sign In With Facebook"
-    },
-    register: {
-      google: "signup_with",
-      facebook: "Continue with Facebook"
-    }
+  facebookBtn = {
+    login: "Sign In With Facebook",
+    register: "Continue with Facebook"
   }
 
   ngOnInit(): void {
