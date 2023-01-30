@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { AuthService } from 'src/angular/app/services/auth.service';
 
@@ -10,15 +10,28 @@ import { AuthService } from 'src/angular/app/services/auth.service';
 export class OauthComponent implements OnInit, OnDestroy {
 
   oauthLoginSub: Subscription
+  @Input() formType = 'login'
   @Output() signInDone = new EventEmitter<boolean>(false);
 
   constructor(
     private readonly authService: AuthService
   ) { }
 
+  buttonText = {
+    login: {
+      google: "signin_with",
+      facebook: "Sign In With Facebook"
+    },
+    register: {
+      google: "signup_with",
+      facebook: "Continue with Facebook"
+    }
+  }
+
   ngOnInit(): void {
     this.oauthLoginSub = this.authService.subscribeAuthState().subscribe({
       next: (user) => {
+        console.log(user)
         if (!user ) {
           return this.authService.signOut()
         }

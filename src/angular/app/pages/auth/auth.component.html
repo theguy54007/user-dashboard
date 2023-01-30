@@ -1,6 +1,6 @@
 <div class="container authWrapper">
   <div class="row">
-    <div class="col-sm-9 col-md-7 col-lg-5 mx-auto">
+    <div class="col-sm-9 col-md-7 col-lg-5 mx-auto" style="max-width: 475px;">
       <div class="card border-0 shadow rounded-3 my-5">
         <!-- login / register / forgot password -->
         <div *ngIf="!showVerifiedMailNotice" class="card-body p-4 p-sm-5">
@@ -12,7 +12,7 @@
             <span *ngIf="formType !== 'login'" class="link-primary" (click)="onSwitchMode('login')" type="button">Switch to Sign In </span>
             <span *ngIf="formType === 'login'"class="link-primary" (click)="onSwitchMode('forgotPassword')" type="button">forgot password</span>
           </div>
-          <app-oauth (signInDone)="onOauthSignIn($event)" *ngIf="['login', 'register'].includes(formType)"></app-oauth>
+          <app-oauth (signInDone)="onOauthSignIn($event)" *ngIf="['login', 'register'].includes(formType)" [formType]="formType"></app-oauth>
         </div>
 
         <!-- notice -->

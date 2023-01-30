@@ -23,7 +23,7 @@ export class AuthComponent implements OnInit {
 
   titleMapping = {
     login: 'Sign In',
-    register: 'Sign Up',
+    register: 'Create Account',
     forgotPassword: 'Forgot Password'
   }
 

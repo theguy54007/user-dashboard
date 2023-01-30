@@ -1,14 +1,23 @@
 <hr class="my-4">
 <div  class="d-grid mb-2">
   <asl-google-signin-button
+    *ngIf="formType === 'login'"
     type='standard'
     shape="rectangular"
     width="355"
     size='large'>
   </asl-google-signin-button>
+  <asl-google-signin-button
+    *ngIf="formType === 'register'"
+    type='standard'
+    shape="rectangular"
+    width="355"
+    text="continue_with"
+    size='large'>
+  </asl-google-signin-button>
 </div>
 <div class="d-grid">
   <button class="btn btn-facebook btn-login text-uppercase fw-bold" (click)="signInWithFB()" type="submit">
-    <i class="fab fa-facebook-f me-2"></i> Sign in with Facebook
+    <i class="fab fa-facebook-f me-2"></i> {{ buttonText[formType].facebook }}
   </button>
 </div>
